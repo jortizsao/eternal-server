@@ -31,9 +31,9 @@ function initBus(app) {
   app.bus = bus(app);
 }
 
-function initSphereClient(app) {
-  app.getSphereClient = () =>
-    new SphereClient({
+function initCTClient(app) {
+  if (process.env.NODE_ENV !== 'test') {
+    app.ctClient = new SphereClient({
       config: {
         client_id: app.config.get('COMMERCE_TOOLS:CLIENT_ID'),
         client_secret: app.config.get('COMMERCE_TOOLS:CLIENT_SECRET'),
@@ -43,8 +43,7 @@ function initSphereClient(app) {
       oauth_host: app.config.get('COMMERCE_TOOLS:OAUTH_URL'),
     });
 
-  app.getRestSphereClient = () =>
-    new Rest({
+    app.restCTClient = new Rest({
       config: {
         client_id: app.config.get('COMMERCE_TOOLS:CLIENT_ID'),
         client_secret: app.config.get('COMMERCE_TOOLS:CLIENT_SECRET'),
@@ -53,6 +52,7 @@ function initSphereClient(app) {
       host: app.config.get('COMMERCE_TOOLS:API_HOST'),
       oauth_host: app.config.get('COMMERCE_TOOLS:OAUTH_URL'),
     });
+  }
 }
 
 function initMiddleware(app) {
@@ -79,7 +79,8 @@ function initErrorRoutes(app) {
       return next();
     }
     // Log it
-    console.error(err.stack);
+    app.logger.error(err.stack);
+    res.sendStatus(500);
     // Redirect to error page
   });
 }
@@ -95,7 +96,7 @@ export default () => {
   initLogger(app);
   initUtils(app);
   initBus(app);
-  initSphereClient(app);
+  initCTClient(app);
   initMiddleware(app);
   initModulesServerRoutes(app);
   initErrorRoutes(app);

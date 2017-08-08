@@ -20,7 +20,7 @@
     "server": "node app",
     "start": "npm-watch",
     "jasmine": "jasmine",
-    "test": "npm-run-all build jasmine",
+    "test": "NODE_ENV=test npm-run-all build jasmine",
     "build": "rimraf ./app && babel src -d app && npm run copy_config"
   },
   "author": "javier.ortizsaorin@gmail.com",

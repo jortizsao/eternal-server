@@ -1,3 +1,7 @@
+import commons from './commons';
+
 export default () => {
-  return {};
+  return {
+    commons,
+  };
 };
