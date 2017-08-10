@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import compression from 'compression';
 import { SphereClient, Rest } from 'sphere-node-sdk';
 import bodyParser from 'body-parser';
+import cors from 'cors';
 
 import logger from './logger';
 import utils from './utils';
@@ -56,6 +57,7 @@ function initCTClient(app) {
 }
 
 function initMiddleware(app) {
+  app.use(cors());
   app.use(compression());
 
   if (process.env.NODE_ENV === 'production') {
