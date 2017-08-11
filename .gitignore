@@ -7,3 +7,7 @@ jspm_packages
 
 # Babel output
 app
+
+# Istanbul output
+.nyc_output
+coverage

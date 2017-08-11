@@ -20,7 +20,7 @@
     "server": "node app",
     "start": "npm-watch",
     "jasmine": "jasmine",
-    "test": "NODE_ENV=test npm-run-all build jasmine",
+    "test": "NODE_ENV=test npm run build && nyc --reporter=lcov jasmine",
     "build": "rimraf ./app && babel src -d app && npm run copy_config"
   },
   "author": "javier.ortizsaorin@gmail.com",
@@ -28,6 +28,7 @@
   "devDependencies": {
     "babel-cli": "^6.24.0",
     "babel-eslint": "^7.2.3",
+    "babel-plugin-istanbul": "^4.1.4",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.2.2",
@@ -46,6 +47,7 @@
     "lint-staged": "^3.4.0",
     "npm-run-all": "^4.0.2",
     "npm-watch": "^0.1.8",
+    "nyc": "^11.1.0",
     "rimraf": "^2.6.1"
   },
   "dependencies": {

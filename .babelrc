@@ -7,4 +7,9 @@
     }],
   ],
   "plugins": ["transform-object-rest-spread", "transform-runtime"],
+  "env": {
+    "test": {
+      "plugins": [ "istanbul" ]
+    },
+  },
 }

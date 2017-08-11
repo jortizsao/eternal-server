@@ -1,5 +1,7 @@
+env:
+  CODECLIMATE_REPO_TOKEN: 6f812b9c55d49ec9a0f12f389e822a97c6297a8859e37af80f546e5fcc332852
 language: node_js
 node_js:
   - 8
-env:
-  CODECLIMATE_REPO_TOKEN: 48f7db6d211f443a06186a129722cf5f3dff3dc9c9bed45f79023b574df8f859
+script:
+  - NODE_ENV=test npm test
