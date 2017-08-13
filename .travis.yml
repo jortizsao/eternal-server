@@ -1,7 +1,8 @@
-env:
-  CODECLIMATE_REPO_TOKEN: 6f812b9c55d49ec9a0f12f389e822a97c6297a8859e37af80f546e5fcc332852
 language: node_js
 node_js:
   - 8
 script:
   - NODE_ENV=test npm test
+after_success:
+  - npm install -g codeclimate-test-reporter
+  - codeclimate-test-reporter < coverate/lcov.info
