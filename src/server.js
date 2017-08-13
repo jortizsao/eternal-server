@@ -16,7 +16,10 @@ import routes from './routes';
 function initConfig(app) {
   app.config = configuration([
     path.join(__dirname, 'config/env/default.json'),
-    path.join(__dirname, `config/env/${process.env.NODE_ENV || 'development'}.json`),
+    path.join(
+      __dirname,
+      `config/env/${process.env.NODE_ENV || 'development'}.json`,
+    ),
   ]);
 }
 
@@ -34,7 +37,7 @@ function initBus(app) {
 
 function initCTClient(app) {
   if (process.env.NODE_ENV !== 'test') {
-    app.ctClient = new SphereClient({
+    const ctConfig = {
       config: {
         client_id: app.config.get('COMMERCE_TOOLS:CLIENT_ID'),
         client_secret: app.config.get('COMMERCE_TOOLS:CLIENT_SECRET'),
@@ -42,17 +45,10 @@ function initCTClient(app) {
       },
       host: app.config.get('COMMERCE_TOOLS:API_HOST'),
       oauth_host: app.config.get('COMMERCE_TOOLS:OAUTH_URL'),
-    });
+    };
 
-    app.restCTClient = new Rest({
-      config: {
-        client_id: app.config.get('COMMERCE_TOOLS:CLIENT_ID'),
-        client_secret: app.config.get('COMMERCE_TOOLS:CLIENT_SECRET'),
-        project_key: app.config.get('COMMERCE_TOOLS:PROJECT_KEY'),
-      },
-      host: app.config.get('COMMERCE_TOOLS:API_HOST'),
-      oauth_host: app.config.get('COMMERCE_TOOLS:OAUTH_URL'),
-    });
+    app.ctClient = new SphereClient(ctConfig);
+    app.restCTClient = new Rest(ctConfig);
   }
 }
 
