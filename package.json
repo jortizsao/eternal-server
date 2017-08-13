@@ -59,6 +59,8 @@
     "helmet": "^3.8.1",
     "morgan": "^1.8.2",
     "nconf": "^0.8.4",
+    "passport": "^0.4.0",
+    "passport-local": "^1.0.0",
     "sphere-node-sdk": "^1.19.1",
     "underscore": "^1.8.3",
     "winston": "^2.3.1",

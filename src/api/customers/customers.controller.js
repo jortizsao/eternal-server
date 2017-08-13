@@ -1,12 +1,12 @@
 import customersServiceModule from './customers.service';
 import { ValidationError } from '../../errors';
 
-export default (app) => {
+export default app => {
   const controller = {};
   const utils = app.utils;
   const customersService = customersServiceModule(app);
 
-  controller.hasAllRequiredFields = (customer) => {
+  controller.hasAllRequiredFields = customer => {
     const requiredFields = [
       customer.firstName,
       customer.lastName,
@@ -18,21 +18,22 @@ export default (app) => {
     return requiredFields.every(field => !utils.commons.isStringEmpty(field));
   };
 
-  controller.passwordAndConfirmPasswordMatch = (customer) => {
+  controller.passwordAndConfirmPasswordMatch = customer => {
     return customer.password === customer.confirmPassword;
   };
 
-  controller.getCleanCustomer = (customer) => {
+  controller.getCleanCustomer = customer => {
     return {
       firstName: customer.firstName && customer.firstName.trim(),
       lastName: customer.lastName && customer.lastName.trim(),
       email: customer.email && customer.email.trim(),
       password: customer.password && customer.password.trim(),
-      confirmPassword: customer.confirmPassword && customer.confirmPassword.trim(),
+      confirmPassword:
+        customer.confirmPassword && customer.confirmPassword.trim(),
     };
   };
 
-  controller.getValidCustomerToRegister = (customer) => {
+  controller.getValidCustomerToRegister = customer => {
     const cleanCustomer = controller.getCleanCustomer(customer);
 
     if (controller.hasAllRequiredFields(cleanCustomer)) {
@@ -48,8 +49,20 @@ export default (app) => {
 
   controller.signUp = (req, res, next) => {
     try {
-      const { firstName, lastName, email, password, confirmPassword } = req.body;
-      const customer = { firstName, lastName, email, password, confirmPassword };
+      const {
+        firstName,
+        lastName,
+        email,
+        password,
+        confirmPassword,
+      } = req.body;
+      const customer = {
+        firstName,
+        lastName,
+        email,
+        password,
+        confirmPassword,
+      };
       const validCustomer = controller.getValidCustomerToRegister(customer);
 
       return customersService
@@ -57,20 +70,36 @@ export default (app) => {
           filter: `lowercaseEmail="${validCustomer.email.toLowerCase()}"`,
         })
         .then(({ results }) => results[0])
-        .then((existingCustomer) => {
+        .then(existingCustomer => {
           if (existingCustomer) {
-            return res.status(400).send({ message: 'Email already registered' });
+            return res
+              .status(400)
+              .send({ message: 'Email already registered' });
           } else {
             return customersService
               .signUp(validCustomer)
-              .then(customerCreated => ({ ...customerCreated.customer, password: undefined }))
-              .then(customerCreatedNoPassword => res.json(customerCreatedNoPassword));
+              .then(customerCreated => ({
+                ...customerCreated.customer,
+                password: undefined,
+              }))
+              .then(customerCreatedNoPassword =>
+                res.json(customerCreatedNoPassword),
+              );
           }
         })
         .catch(next);
     } catch (err) {
       return res.status(400).send({ message: err.message });
     }
+  };
+
+  controller.signIn = (req, res) => {
+    return res.json({
+      customer: {
+        ...req.user,
+        password: undefined,
+      },
+    });
   };
 
   return controller;

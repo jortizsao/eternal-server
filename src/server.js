@@ -6,6 +6,7 @@ import compression from 'compression';
 import { SphereClient, Rest } from 'sphere-node-sdk';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import passport from 'passport';
 
 import logger from './logger';
 import utils from './utils';
@@ -68,6 +69,7 @@ function initMiddleware(app) {
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(helmet());
+  app.use(passport.initialize());
 }
 
 function initErrorRoutes(app) {
