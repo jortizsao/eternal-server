@@ -7,11 +7,11 @@ script:
   - NODE_ENV=test npm test
 after_success:
   - npm install -g codeclimate-test-reporter
-  - codeclimate-test-reporter < coverate/lcov.info
+  - codeclimate-test-reporter < coverage/lcov.info
   - if [ -n "$TRAVIS_TAG" ]; then
-    docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
-    docker build -t $DOCKER_REPO:latest .
-    docker tag $DOCKER_REPO:$TRAVIS_COMMIT
-    docker tag $DOCKER_REPO:$TRAVIS_TAG
-    docker push $DOCKER_REPO
+    docker login -u $DOCKER_USER -p $DOCKER_PASSWORD;
+    docker build -t $DOCKER_REPO:latest .;
+    docker tag $DOCKER_REPO:$TRAVIS_COMMIT;
+    docker tag $DOCKER_REPO:$TRAVIS_TAG;
+    docker push $DOCKER_REPO;
     fi
