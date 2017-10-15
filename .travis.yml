@@ -10,8 +10,8 @@ after_success:
   - codeclimate-test-reporter < coverage/lcov.info
   - if [ -n "$TRAVIS_TAG" ]; then
     docker login -u $DOCKER_USER -p $DOCKER_PASSWORD;
-    docker build -t $DOCKER_REPO:latest .;
-    docker tag $DOCKER_REPO:$TRAVIS_COMMIT;
-    docker tag $DOCKER_REPO:$TRAVIS_TAG;
+    docker build -t $DOCKER_REPO:$TRAVIS_COMMIT .;
+    docker tag $DOCKER_REPO:$TRAVIS_COMMIT $DOCKER_REPO:$TRAVIS_TAG;
+    docker tag $DOCKER_REPO:$TRAVIS_COMMIT $DOCKER_REPO:latest;
     docker push $DOCKER_REPO;
     fi
