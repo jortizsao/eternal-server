@@ -16,7 +16,12 @@ COPY ["package.json", ".babelrc", ".eslintrc.js", ".eslintignore", "README.md", 
 
 RUN yarn install
 
+COPY ["spec", "spec"]
 COPY ["src", "src"]
+
+# Run tests
+ENV NODE_ENV test
+RUN npm test
 
 # Expose port
 ENV PORT 3000
