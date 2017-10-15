@@ -8,20 +8,19 @@
     "npm": ">= 5.0.0"
   },
   "watch": {
-    "run": "src"
+    "dev": "src"
   },
   "scripts": {
+    "babel": "babel src -d app",
     "clean": "rimraf ./app",
     "copy_config": "cp -r src/config/env app/config/env",
     "lint": "eslint src",
-    "install_dependencies:dev": "yarn install",
-    "install_dependencies:prod": "yarn install --production",
-    "run": "npm run install_dependencies:dev && npm-run-all -p lint build -s jasmine server",
+    "dev": "npm-run-all test server",
     "server": "node app",
     "start": "npm-watch",
-    "jasmine": "jasmine",
-    "test": "NODE_ENV=test npm run build && nyc --reporter=lcov jasmine",
-    "build": "rimraf ./app && babel src -d app && npm run copy_config"
+    "jasmine": "nyc --reporter=lcov jasmine",
+    "test": "npm-run-all lint build jasmine",
+    "build": "npm-run-all clean babel copy_config"
   },
   "author": "javier.ortizsaorin@gmail.com",
   "license": "MIT",

@@ -11,3 +11,6 @@ app
 # Istanbul output
 .nyc_output
 coverage
+
+# Environment
+deployment.env
