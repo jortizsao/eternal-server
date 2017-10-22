@@ -10,17 +10,25 @@
   "watch": {
     "dev": "src"
   },
+  "nyc": {
+    "include": ["src/**/*.js"],
+    "exclude": ["src/**/*.spec.js"],
+    "reporter": ["lcov", "text-summary"],
+    "require": ["babel-register"],
+    "sourceMap": false,
+    "instrument": false
+  },
   "scripts": {
     "babel": "babel src -d app",
     "clean": "rimraf ./app",
     "copy_config": "cp -r src/config/env app/config/env",
     "lint": "eslint src",
-    "dev": "npm-run-all test server",
+    "dev": "npm-run-all build server",
     "server": "node app",
     "start": "npm-watch",
-    "jasmine": "nyc --reporter=lcov jasmine",
-    "test": "npm-run-all lint build jasmine",
-    "build": "npm-run-all clean babel copy_config"
+    "jasmine": "nyc jasmine",
+    "test": "cross-env NODE_ENV=test npm-run-all build jasmine",
+    "build": "npm-run-all lint clean babel copy_config"
   },
   "author": "javier.ortizsaorin@gmail.com",
   "license": "MIT",
@@ -54,12 +62,15 @@
     "body-parser": "^1.17.2",
     "compression": "^1.7.0",
     "cors": "^2.8.4",
+    "cross-env": "^5.1.0",
     "express": "^4.15.3",
     "helmet": "^3.8.1",
     "morgan": "^1.8.2",
     "nconf": "^0.8.4",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
+    "request": "^2.83.0",
+    "request-promise": "^4.2.2",
     "sphere-node-sdk": "^1.19.1",
     "underscore": "^1.8.3",
     "winston": "^2.3.1",

@@ -1,11 +1,9 @@
 import deepFreeze from 'deep-freeze';
-import server from '../../../server';
+import app from '../../../server';
 import { ValidationError } from '../../../errors';
 import customersControllerModule from '../customers.controller';
 
 describe('Customers', () => {
-  const app = server();
-
   describe('Controller', () => {
     const customersController = customersControllerModule(app);
 

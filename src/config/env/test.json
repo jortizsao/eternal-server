@@ -1,15 +1,10 @@
 {
   "LOGGER": {
-    "LEVEL": "debug"
+    "LEVEL": "error"
   },
-  "TOKEN": {
-    "SECRET": "",
-    "MAX_AGE_SECONDS": 604800
-  },
-  "COMMERCE_TOOLS": {
-    "PROJECT_KEY": "",
-    "CLIENT_ID": "",
-    "CLIENT_SECRET": "",
-    "INVENTORY_MODE": ""
+  "CMS": {
+    "PRIVATE_ACCESS_TOKEN": "privateAccessToken",
+    "PUBLIC_ACCESS_TOKEN": "publicAccessToken",
+    "CACHE_ENABLED": true
   }
 }

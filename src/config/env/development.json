@@ -15,5 +15,11 @@
       "CUSTOMERS": "",
       "ORDERS": ""
     }
+  },
+  "CMS": {
+    "URL": "",
+    "PRIVATE_ACCESS_TOKEN": "",
+    "PUBLIC_ACCESS_TOKEN": "",
+    "CACHE_ENABLED": true
   }
 }

@@ -6,4 +6,4 @@ function init(app) {
   });
 }
 
-export default init(application());
+export default init(application);

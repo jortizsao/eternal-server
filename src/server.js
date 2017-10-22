@@ -17,10 +17,7 @@ import routes from './routes';
 function initConfig(app) {
   app.config = configuration([
     path.join(__dirname, 'config/env/default.json'),
-    path.join(
-      __dirname,
-      `config/env/${process.env.NODE_ENV || 'development'}.json`,
-    ),
+    path.join(__dirname, `config/env/${process.env.NODE_ENV || 'development'}.json`),
   ]);
 }
 
@@ -89,7 +86,7 @@ function initModulesServerRoutes(app) {
   routes(app);
 }
 
-export default () => {
+function getServer() {
   const app = express();
 
   initConfig(app);
@@ -102,4 +99,6 @@ export default () => {
   initErrorRoutes(app);
 
   return app;
-};
+}
+
+export default getServer();
