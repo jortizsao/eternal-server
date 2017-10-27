@@ -1,3 +1,4 @@
+import nock from 'nock';
 import app from '../../../server';
 import cmsControllerModule from '../cms.controller';
 import * as cmsServiceModule from '../cms.service';
@@ -268,7 +269,6 @@ describe('CMS', () => {
         slug: 'home',
         full_slug: 'en/home',
       };
-      spyOn(cmsService, 'getFromCms').and.returnValue(Promise.resolve(story));
     });
 
     describe('stories', () => {
@@ -287,6 +287,7 @@ describe('CMS', () => {
       });
 
       it('should return the story from cache if exists and it is the published version', done => {
+        spyOn(cmsService, 'getFromCms').and.returnValue(Promise.resolve(story));
         spyOn(cmsService, 'getFromCache').and.callThrough();
 
         cmsService.storeInCache(story, 'published');
@@ -302,6 +303,7 @@ describe('CMS', () => {
       });
 
       it('should get the story from the cms if it is the published version and it is not in the cache, and store into the cache afterwards', done => {
+        spyOn(cmsService, 'getFromCms').and.returnValue(Promise.resolve(story));
         spyOn(cmsService, 'storeInCache');
 
         expect(cmsService.getFromCache('en/home', 'published')).toBeUndefined();
@@ -317,6 +319,7 @@ describe('CMS', () => {
       });
 
       it('should not get the story from cache if it is the draft version of the story', done => {
+        spyOn(cmsService, 'getFromCms').and.returnValue(Promise.resolve(story));
         spyOn(cmsService, 'getFromCache');
 
         cmsService
@@ -330,6 +333,7 @@ describe('CMS', () => {
       });
 
       it('should not store into the cache if it is the draft version of the story', done => {
+        spyOn(cmsService, 'getFromCms').and.returnValue(Promise.resolve(story));
         spyOn(cmsService, 'storeInCache');
 
         cmsService
@@ -341,11 +345,36 @@ describe('CMS', () => {
           })
           .then(done, done.fail);
       });
+
+      it('should get a story from the CMS', done => {
+        const slug = 'en/home';
+        const version = 'draft';
+        const token = '123456789';
+        const host = app.config.get('CMS:URL');
+
+        nock(host)
+          .get(`/${slug}`)
+          .query({
+            version,
+            token,
+          })
+          .reply(200, {
+            story,
+          });
+
+        cmsService
+          .getFromCms(slug, version, token)
+          .then(storyReturned => {
+            expect(storyReturned).toEqual(story);
+          })
+          .then(done, done.fail);
+      });
     });
 
     describe('cache', () => {
       it('should be enabled via config variable', done => {
         const configGetSpy = spyOn(app.config, 'get');
+        spyOn(cmsService, 'getFromCms').and.returnValue(Promise.resolve(story));
 
         configGetSpy.and.callFake(configVariable => {
           if (configVariable === 'CMS:CACHE_ENABLED') {
@@ -369,6 +398,7 @@ describe('CMS', () => {
 
       it('should be disabled via config variable', done => {
         const configGetSpy = spyOn(app.config, 'get');
+        spyOn(cmsService, 'getFromCms').and.returnValue(Promise.resolve(story));
 
         configGetSpy.and.callFake(configVariable => {
           if (configVariable === 'CMS:CACHE_ENABLED') {

@@ -52,6 +52,7 @@
     "jasmine": "^2.5.3",
     "jasmine-spec-reporter": "^3.2.0",
     "lint-staged": "^3.4.0",
+    "nock": "^9.0.25",
     "npm-run-all": "^4.0.2",
     "npm-watch": "^0.1.8",
     "nyc": "^11.1.0",

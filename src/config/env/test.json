@@ -3,6 +3,7 @@
     "LEVEL": "error"
   },
   "CMS": {
+    "URL": "http://thisismycms.com",
     "PRIVATE_ACCESS_TOKEN": "privateAccessToken",
     "PUBLIC_ACCESS_TOKEN": "publicAccessToken",
     "CACHE_ENABLED": true
