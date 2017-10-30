@@ -19,11 +19,11 @@ describe('CMS', () => {
         slug: 'home',
         full_slug: 'en/home',
       };
+      spyOn(cmsService, 'getFromCms').and.returnValue(Promise.resolve(story));
     });
 
     describe('stories', () => {
       it('should return the story from cache if exists and it is the published version', done => {
-        spyOn(cmsService, 'getFromCms').and.returnValue(Promise.resolve(story));
         spyOn(cache, 'get').and.returnValue(Promise.resolve(story));
 
         cmsService
@@ -37,7 +37,6 @@ describe('CMS', () => {
       });
 
       it('should get the story from the cms if it is the published version and it is not in the cache, and store into the cache afterwards', done => {
-        spyOn(cmsService, 'getFromCms').and.returnValue(Promise.resolve(story));
         spyOn(cache, 'store');
 
         expect(cache.get('en/home', 'published')).toBeUndefined();
@@ -53,7 +52,6 @@ describe('CMS', () => {
       });
 
       it('should not get the story from cache if it is the draft version of the story', done => {
-        spyOn(cmsService, 'getFromCms').and.returnValue(Promise.resolve(story));
         spyOn(cache, 'get');
 
         cmsService
@@ -67,7 +65,6 @@ describe('CMS', () => {
       });
 
       it('should not store into the cache if it is the draft version of the story', done => {
-        spyOn(cmsService, 'getFromCms').and.returnValue(Promise.resolve(story));
         spyOn(cache, 'store');
 
         cmsService
@@ -108,7 +105,6 @@ describe('CMS', () => {
     describe('cache', () => {
       it('should be enabled via config variable', done => {
         const configGetSpy = spyOn(config, 'get');
-        spyOn(cmsService, 'getFromCms').and.returnValue(Promise.resolve(story));
 
         configGetSpy.and.callFake(configVariable => {
           if (configVariable === 'CMS:CACHE_ENABLED') {
@@ -132,7 +128,6 @@ describe('CMS', () => {
 
       it('should be disabled via config variable', done => {
         const configGetSpy = spyOn(config, 'get');
-        spyOn(cmsService, 'getFromCms').and.returnValue(Promise.resolve(story));
 
         configGetSpy.and.callFake(configVariable => {
           if (configVariable === 'CMS:CACHE_ENABLED') {
