@@ -2,15 +2,20 @@ import path from 'path';
 import fs from 'fs';
 import conf from 'nconf';
 
-export default (stores) => {
-  const storesFiles = stores || {};
+export default () => {
   process.env.NODE_ENV = process.env.NODE_ENV || 'development';
   const env = process.env.NODE_ENV;
   const rootPath = path.normalize(`${__dirname}/../..`);
+  const storesFiles = [
+    path.join(__dirname, 'env/default.json'),
+    path.join(__dirname, `env/${env || 'development'}.json`),
+  ];
 
-  console.log('%s - \u001b[32minfo\u001b[39m: [config] using [%s] configuration',
-    new Date().toISOString(), env);
-
+  console.log(
+    '%s - \u001b[32minfo\u001b[39m: [config] using [%s] configuration',
+    new Date().toISOString(),
+    env,
+  );
 
   //  Hierarchy
   //
@@ -21,7 +26,7 @@ export default (stores) => {
   conf.argv();
 
   let i = 1;
-  storesFiles.forEach((configFile) => {
+  storesFiles.forEach(configFile => {
     let file = configFile;
 
     if (file) {
@@ -30,28 +35,34 @@ export default (stores) => {
           file = `${rootPath}/env/${file}`;
         }
         file = path.normalize(file);
-        console.log('%s - \u001b[32minfo\u001b[39m: [config] using file [%s]',
+        console.log(
+          '%s - \u001b[32minfo\u001b[39m: [config] using file [%s]',
           new Date().toISOString(),
-          file);
+          file,
+        );
         try {
           if (!fs.existsSync(file)) {
-            throw new Error('File doesn\'t exist');
+            throw new Error("File doesn't exist");
           }
           const obj = {
             type: 'file',
             file,
           };
-          conf.use(`z${i += 1}`, obj);
+          conf.use(`z${(i += 1)}`, obj);
         } catch (e) {
-          console.log('%s - \u001b[31merror\u001b[39m: [config] file [%s] error [%s]',
+          console.log(
+            '%s - \u001b[31merror\u001b[39m: [config] file [%s] error [%s]',
             new Date().toISOString(),
             file,
-            e.message);
+            e.message,
+          );
         }
       } else {
-        console.log('%s - \u001b[31mwarn\u001b[39m: [config] file [%s] not exists',
+        console.log(
+          '%s - \u001b[31mwarn\u001b[39m: [config] file [%s] not exists',
           new Date().toISOString(),
-          file);
+          file,
+        );
       }
     }
   });

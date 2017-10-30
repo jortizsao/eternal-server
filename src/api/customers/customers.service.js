@@ -1,8 +1,6 @@
-export default app => {
-  const service = {};
-  const ctClient = app.ctClient;
-  const restCTClient = app.restCTClient;
-  const config = app.config;
+export default ({ commercetools, config }) => {
+  const ctClient = commercetools.ctClient;
+  const restCTClient = commercetools.restCTClient;
   const customersSequence = config.get('COMMERCE_TOOLS:SEQUENCES:CUSTOMERS');
 
   function getCustomerNumber(sequence) {
@@ -28,46 +26,38 @@ export default app => {
       });
   }
 
-  service.find = params => {
-    const { filter, page, perPage, all, sortBy, sortAscending } = params;
-    let customersClient = ctClient.customers;
+  return {
+    find(params) {
+      const { filter, page, perPage, all, sortBy, sortAscending } = params;
+      let customersClient = ctClient.customers;
 
-    if (all) {
-      customersClient = customersClient.all();
-    } else {
-      // Bug in CT SDK if you get 'all()' then you can't sort, otherwise you will
-      // get repeated results
-      customersClient = sortBy
-        ? customersClient.sort(sortBy, sortAscending)
-        : customersClient;
-      customersClient = page ? customersClient.page(page) : customersClient;
-      customersClient = perPage
-        ? customersClient.perPage(page)
-        : customersClient;
-    }
-    return customersClient
-      .where(filter)
-      .fetch()
-      .then(res => ({ results: res.body.results, total: res.body.total }));
-  };
+      if (all) {
+        customersClient = customersClient.all();
+      } else {
+        // Bug in CT SDK if you get 'all()' then you can't sort, otherwise you will
+        // get repeated results
+        customersClient = sortBy ? customersClient.sort(sortBy, sortAscending) : customersClient;
+        customersClient = page ? customersClient.page(page) : customersClient;
+        customersClient = perPage ? customersClient.perPage(page) : customersClient;
+      }
+      return customersClient
+        .where(filter)
+        .fetch()
+        .then(res => ({ results: res.body.results, total: res.body.total }));
+    },
 
-  service.signUp = customer => {
-    return getCustomerNumber(customersSequence)
-      .then(customerNumber => ({
-        ...customer,
-        customerNumber: customerNumber.toString(),
-      }))
-      .then(customerToSave =>
-        ctClient.customers.save(customerToSave).then(res => res.body),
-      );
-  };
+    signUp(customer) {
+      return getCustomerNumber(customersSequence)
+        .then(customerNumber => ({
+          ...customer,
+          customerNumber: customerNumber.toString(),
+        }))
+        .then(customerToSave => ctClient.customers.save(customerToSave).then(res => res.body));
+    },
 
-  service.signIn = (email, password, anonymousCartId) => {
-    return new Promise((resolve, reject) => {
-      restCTClient.POST(
-        '/login',
-        { email, password, anonymousCartId },
-        (err, res) => {
+    signIn(email, password, anonymousCartId) {
+      return new Promise((resolve, reject) => {
+        restCTClient.POST('/login', { email, password, anonymousCartId }, (err, res) => {
           if (err) {
             return reject(err);
           } else if (res.statusCode === 400) {
@@ -75,10 +65,8 @@ export default app => {
           } else {
             return resolve(res.body.customer);
           }
-        },
-      );
-    });
+        });
+      });
+    },
   };
-
-  return service;
 };

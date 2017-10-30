@@ -1,27 +1,23 @@
-import nock from 'nock';
-import app from '../../../server';
-import cmsControllerModule from '../cms.controller';
-import * as cmsServiceModule from '../cms.service';
+import CmsController from '../cms.controller';
+import Config from '../../../config';
+import Logger from '../../../logger';
+import { httpResponse as res } from '../../../../spec/helpers/mocks';
 
 describe('CMS', () => {
   describe('Controller', () => {
-    let cmsController;
-    let cmsService;
-    const res = {
-      json: () => {},
-      sendStatus: () => {},
+    const config = Config();
+    const logger = Logger({ config });
+    const cmsService = {
+      getStory: () => {},
+      clearCache: () => {},
     };
-    const next = jasmine.createSpy();
+    const cmsController = CmsController({ config, logger, cmsService });
+    let next;
 
     beforeEach(() => {
-      cmsService = {
-        getStory: () => {},
-        clearCache: () => {},
-      };
       spyOn(res, 'json');
       spyOn(res, 'sendStatus');
-      spyOn(cmsServiceModule, 'default').and.returnValue(cmsService);
-      cmsController = cmsControllerModule(app);
+      next = jasmine.createSpy();
     });
 
     describe('stories', () => {
@@ -253,171 +249,6 @@ describe('CMS', () => {
 
         cmsController.clearCache(req, res, next);
         expect(next).toHaveBeenCalledWith(new Error('Unexpected error'));
-      });
-    });
-  });
-
-  describe('Service', () => {
-    let cmsService;
-    let story;
-
-    beforeEach(() => {
-      cmsService = cmsServiceModule.default(app);
-      cmsService.clearCache();
-      story = {
-        id: 'id1',
-        slug: 'home',
-        full_slug: 'en/home',
-      };
-    });
-
-    describe('stories', () => {
-      it('should store a story into the cache', () => {
-        cmsService.storeInCache(story, 'published');
-
-        expect(cmsService.getCache()).toEqual({
-          'en/home': {
-            published: {
-              id: 'id1',
-              slug: 'home',
-              full_slug: 'en/home',
-            },
-          },
-        });
-      });
-
-      it('should return the story from cache if exists and it is the published version', done => {
-        spyOn(cmsService, 'getFromCms').and.returnValue(Promise.resolve(story));
-        spyOn(cmsService, 'getFromCache').and.callThrough();
-
-        cmsService.storeInCache(story, 'published');
-
-        cmsService
-          .getStory('en/home', 'published', 'token')
-          .then(storyResponse => {
-            expect(storyResponse).toEqual(story);
-            expect(cmsService.getFromCms).not.toHaveBeenCalled();
-            expect(cmsService.getFromCache).toHaveBeenCalledWith('en/home', 'published');
-          })
-          .then(done, done.fail);
-      });
-
-      it('should get the story from the cms if it is the published version and it is not in the cache, and store into the cache afterwards', done => {
-        spyOn(cmsService, 'getFromCms').and.returnValue(Promise.resolve(story));
-        spyOn(cmsService, 'storeInCache');
-
-        expect(cmsService.getFromCache('en/home', 'published')).toBeUndefined();
-
-        cmsService
-          .getStory('en/home', 'published', 'token')
-          .then(storyResponse => {
-            expect(storyResponse).toEqual(story);
-            expect(cmsService.getFromCms).toHaveBeenCalledWith('en/home', 'published', 'token');
-            expect(cmsService.storeInCache).toHaveBeenCalledWith(story, 'published');
-          })
-          .then(done, done.fail);
-      });
-
-      it('should not get the story from cache if it is the draft version of the story', done => {
-        spyOn(cmsService, 'getFromCms').and.returnValue(Promise.resolve(story));
-        spyOn(cmsService, 'getFromCache');
-
-        cmsService
-          .getStory('en/home', 'draft', 'token')
-          .then(storyResponse => {
-            expect(storyResponse).toEqual(story);
-            expect(cmsService.getFromCms).toHaveBeenCalledWith('en/home', 'draft', 'token');
-            expect(cmsService.getFromCache).not.toHaveBeenCalled();
-          })
-          .then(done, done.fail);
-      });
-
-      it('should not store into the cache if it is the draft version of the story', done => {
-        spyOn(cmsService, 'getFromCms').and.returnValue(Promise.resolve(story));
-        spyOn(cmsService, 'storeInCache');
-
-        cmsService
-          .getStory('en/home', 'draft', 'token')
-          .then(storyResponse => {
-            expect(storyResponse).toEqual(story);
-            expect(cmsService.getFromCms).toHaveBeenCalledWith('en/home', 'draft', 'token');
-            expect(cmsService.storeInCache).not.toHaveBeenCalled();
-          })
-          .then(done, done.fail);
-      });
-
-      it('should get a story from the CMS', done => {
-        const slug = 'en/home';
-        const version = 'draft';
-        const token = '123456789';
-        const host = app.config.get('CMS:URL');
-
-        nock(host)
-          .get(`/${slug}`)
-          .query({
-            version,
-            token,
-          })
-          .reply(200, {
-            story,
-          });
-
-        cmsService
-          .getFromCms(slug, version, token)
-          .then(storyReturned => {
-            expect(storyReturned).toEqual(story);
-          })
-          .then(done, done.fail);
-      });
-    });
-
-    describe('cache', () => {
-      it('should be enabled via config variable', done => {
-        const configGetSpy = spyOn(app.config, 'get');
-        spyOn(cmsService, 'getFromCms').and.returnValue(Promise.resolve(story));
-
-        configGetSpy.and.callFake(configVariable => {
-          if (configVariable === 'CMS:CACHE_ENABLED') {
-            return true;
-          } else {
-            // if the varialbe is not the one we are interested we use the original function
-            configGetSpy.and.callThrough();
-            return app.config.get(configVariable);
-          }
-        });
-
-        spyOn(cmsService, 'getFromCache');
-
-        cmsService
-          .getStory('en/home', 'published', 'token')
-          .then(() => {
-            expect(cmsService.getFromCache).toHaveBeenCalled();
-          })
-          .then(done, done.fail);
-      });
-
-      it('should be disabled via config variable', done => {
-        const configGetSpy = spyOn(app.config, 'get');
-        spyOn(cmsService, 'getFromCms').and.returnValue(Promise.resolve(story));
-
-        configGetSpy.and.callFake(configVariable => {
-          if (configVariable === 'CMS:CACHE_ENABLED') {
-            return false;
-          } else {
-            // if the varialbe is not the one we are interested we use the original function
-            configGetSpy.and.callThrough();
-            return app.config.get(configVariable);
-          }
-        });
-
-        spyOn(cmsService, 'getFromCache');
-
-        cmsService
-          .getStory('en/home', 'published', 'token')
-          .then(() => {
-            expect(cmsService.getFromCache).not.toHaveBeenCalled();
-          })
-          .then(done, done.fail);
       });
     });
   });

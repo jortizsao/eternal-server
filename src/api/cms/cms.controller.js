@@ -1,10 +1,5 @@
-import cmsServiceModule from './cms.service';
-
-export default app => {
+export default ({ config, logger, cmsService }) => {
   const controller = {};
-  const cmsService = cmsServiceModule(app);
-  const config = app.config;
-  const logger = app.logger;
 
   controller.getStory = (req, res, next) => {
     logger.debug('Getting CMS story');

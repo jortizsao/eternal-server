@@ -1,11 +1,12 @@
 import deepFreeze from 'deep-freeze';
-import app from '../../../server';
 import { ValidationError } from '../../../errors';
-import customersControllerModule from '../customers.controller';
+import CustomersUtils from '../customers.utils';
+import Utils from '../../../utils';
 
 describe('Customers', () => {
-  describe('Controller', () => {
-    const customersController = customersControllerModule(app);
+  describe('Utils', () => {
+    const utils = Utils();
+    const customersUtils = CustomersUtils({ utils });
 
     it('should validate the required fields to sign up', () => {
       const customerWithoutAllFields = {
@@ -64,13 +65,13 @@ describe('Customers', () => {
         confirmPassword: 'test',
       };
 
-      expect(customersController.hasAllRequiredFields(customerWithoutAllFields)).toBe(false);
-      expect(customersController.hasAllRequiredFields(customerWithoutFirstName)).toBe(false);
-      expect(customersController.hasAllRequiredFields(customerWithoutLastName)).toBe(false);
-      expect(customersController.hasAllRequiredFields(customerWithoutEmail)).toBe(false);
-      expect(customersController.hasAllRequiredFields(customerWithoutPassword)).toBe(false);
-      expect(customersController.hasAllRequiredFields(customerWithoutConfirmPassword)).toBe(false);
-      expect(customersController.hasAllRequiredFields(customerWithAllFields)).toBe(true);
+      expect(customersUtils.hasAllRequiredFields(customerWithoutAllFields)).toBe(false);
+      expect(customersUtils.hasAllRequiredFields(customerWithoutFirstName)).toBe(false);
+      expect(customersUtils.hasAllRequiredFields(customerWithoutLastName)).toBe(false);
+      expect(customersUtils.hasAllRequiredFields(customerWithoutEmail)).toBe(false);
+      expect(customersUtils.hasAllRequiredFields(customerWithoutPassword)).toBe(false);
+      expect(customersUtils.hasAllRequiredFields(customerWithoutConfirmPassword)).toBe(false);
+      expect(customersUtils.hasAllRequiredFields(customerWithAllFields)).toBe(true);
     });
 
     it('should check that password and confirm password match', () => {
@@ -90,11 +91,11 @@ describe('Customers', () => {
         confirmPassword: 'test',
       };
 
-      expect(customersController.passwordAndConfirmPasswordMatch(customerNotMatch)).toBe(false);
-      expect(customersController.passwordAndConfirmPasswordMatch(customerMatch)).toBe(true);
+      expect(customersUtils.passwordAndConfirmPasswordMatch(customerNotMatch)).toBe(false);
+      expect(customersUtils.passwordAndConfirmPasswordMatch(customerMatch)).toBe(true);
     });
 
-    it('should get the customer fields clean', () => {
+    it('should get the customer fields cleaned', () => {
       const customer = {
         firstName: '  javier  ',
         lastName: 'ortiz   ',
@@ -103,7 +104,7 @@ describe('Customers', () => {
         confirmPassword: ' test',
       };
 
-      const customerClean = {
+      const cleanedCustomer = {
         firstName: 'javier',
         lastName: 'ortiz',
         email: 'javier.ortizsaorin@gmail.com',
@@ -113,7 +114,7 @@ describe('Customers', () => {
 
       deepFreeze(customer);
 
-      expect(customersController.getCleanCustomer(customer)).toEqual(customerClean);
+      expect(customersUtils.getCleanedCustomer(customer)).toEqual(cleanedCustomer);
     });
 
     it('should check if customer is valid to register', () => {
@@ -135,9 +136,9 @@ describe('Customers', () => {
 
       deepFreeze(validCustomer);
 
-      // prettier-ignore
-      expect(customersController.getValidCustomerToRegister(validCustomer))
-      .toEqual(expectedValidCustomer);
+      expect(customersUtils.getValidCustomerToRegister(validCustomer)).toEqual(
+        expectedValidCustomer,
+      );
 
       const customerWithoutField = {
         firstName: 'javier',
@@ -148,7 +149,7 @@ describe('Customers', () => {
       };
 
       expect(() => {
-        customersController.getValidCustomerToRegister(customerWithoutField);
+        customersUtils.getValidCustomerToRegister(customerWithoutField);
       }).toThrow(new ValidationError('Please fill all required fields'));
 
       const customerPasswordsNotMatch = {
@@ -160,7 +161,7 @@ describe('Customers', () => {
       };
 
       expect(() => {
-        customersController.getValidCustomerToRegister(customerPasswordsNotMatch);
+        customersUtils.getValidCustomerToRegister(customerPasswordsNotMatch);
       }).toThrow(new ValidationError("Passwords fields don't match"));
     });
   });

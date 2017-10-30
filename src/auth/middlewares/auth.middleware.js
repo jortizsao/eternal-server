@@ -1,8 +1,7 @@
 import passport from 'passport';
-import localStrategyModule from '../strategies/local-strategy';
 
-export default app => {
-  localStrategyModule(app); // Loading the local-strategy
+export default ({ authStrategies }) => {
+  authStrategies.forEach(strategy => passport.use(strategy));
 
   return (req, res, next) => {
     passport.authenticate('local', (err, user) => {
@@ -10,12 +9,8 @@ export default app => {
         return next(err);
       }
 
-      if (user) {
-        req.user = user;
-        return next();
-      } else {
-        return res.sendStatus(401);
-      }
+      req.user = user;
+      return next();
     })(req, res, next);
   };
 };
