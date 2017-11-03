@@ -1,1 +1,3 @@
 [![Build Status](https://travis-ci.org/jortizsao/eternal-server-expressjs.svg?branch=master)](https://travis-ci.org/jortizsao/eternal-server-expressjs)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/758f5167c4e14b019e8c8dbee9c1b2f4)](https://www.codacy.com/app/jortizsao/eternal-server-expressjs?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jortizsao/eternal-server-expressjs&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/758f5167c4e14b019e8c8dbee9c1b2f4)](https://www.codacy.com/app/jortizsao/eternal-server-expressjs?utm_source=github.com&utm_medium=referral&utm_content=jortizsao/eternal-server-expressjs&utm_campaign=Badge_Coverage)
