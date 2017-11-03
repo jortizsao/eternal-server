@@ -1,14 +1,17 @@
+LABEL maintainer="javier.ortizsaorin@gmail.com"
+
 FROM node:8
 
 ENV APP_HOME /app
 
 # Install requirements for yarn
-RUN apt-get update && apt-get install -y apt-transport-https
+RUN apt-get update && apt-get install -y --no-install-recommends apt-transport-https=1.0.9.3
 
 # Install yarn
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
 RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
-RUN apt-get update && apt-get install -y yarn
+RUN apt-get update && apt-get install -y --no-install-recommends yarn=1.3  \
+&& apt-get clean && rm -rf /var/lib/apt/lists/
 
 WORKDIR $APP_HOME
 
