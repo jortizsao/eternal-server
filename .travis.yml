@@ -7,7 +7,9 @@ script:
   - NODE_ENV=test npm test
 after_success:
   - npm install -g codeclimate-test-reporter
+  - npm install -g codacy-coverage
   - codeclimate-test-reporter < coverage/lcov.info
+  - codacy-coverage < coverage/lcov.info
   - if [ -n "$TRAVIS_TAG" ]; then
     docker login -u $DOCKER_USER -p $DOCKER_PASSWORD;
     docker build -t $DOCKER_REPO:$TRAVIS_COMMIT .;
