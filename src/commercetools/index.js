@@ -1,14 +1,14 @@
 import { SphereClient, Rest } from 'sphere-node-sdk';
 
-export default ({ config }) => {
+export default ({ clientId, clientSecret, projectKey, host, oauthHost }) => {
   const ctConfig = {
     config: {
-      client_id: config.get('COMMERCE_TOOLS:CLIENT_ID'),
-      client_secret: config.get('COMMERCE_TOOLS:CLIENT_SECRET'),
-      project_key: config.get('COMMERCE_TOOLS:PROJECT_KEY'),
+      client_id: clientId,
+      client_secret: clientSecret,
+      project_key: projectKey,
     },
-    host: config.get('COMMERCE_TOOLS:API_HOST'),
-    oauth_host: config.get('COMMERCE_TOOLS:OAUTH_URL'),
+    host,
+    oauth_host: oauthHost,
   };
 
   return {
