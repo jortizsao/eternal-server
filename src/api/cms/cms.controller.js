@@ -1,12 +1,10 @@
-export default ({ config, logger, cmsService }) => {
+export default ({ privateToken, publicToken, logger, cmsService }) => {
   const controller = {};
 
   controller.getStory = (req, res, next) => {
     logger.debug('Getting CMS story');
     const { token, version } = req.query;
     const slug = req.params[0];
-    const privateToken = config.get('CMS:PRIVATE_ACCESS_TOKEN');
-    const publicToken = config.get('CMS:PUBLIC_ACCESS_TOKEN');
 
     const configTokens = version === 'draft' ? [privateToken] : [privateToken, publicToken];
 
@@ -30,7 +28,6 @@ export default ({ config, logger, cmsService }) => {
   controller.clearCache = (req, res, next) => {
     logger.debug('Clearing CMS cache');
     const { token } = req.query;
-    const privateToken = config.get('CMS:PRIVATE_ACCESS_TOKEN');
 
     try {
       if (token === privateToken) {

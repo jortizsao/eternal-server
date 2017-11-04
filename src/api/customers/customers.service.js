@@ -1,58 +1,45 @@
-export default ({ commercetools, config }) => {
-  const ctClient = commercetools.ctClient;
+export default function ({
+  commercetools,
+  customersSequence,
+  customObjectsService,
+  commonsService,
+}) {
   const restCTClient = commercetools.restCTClient;
-  const customersSequence = config.get('COMMERCE_TOOLS:SEQUENCES:CUSTOMERS');
-
-  function getCustomerNumber(sequence) {
-    return ctClient.customObjects
-      .where(`key="${customersSequence}"`)
-      .fetch()
-      .then(res => res.body.results)
-      .then(results => (results.length > 0 ? results[0] : { value: 1 }))
-      .then(lastValue => ({
-        value: lastValue.value + 1,
-        version: lastValue.version,
-      }))
-      .then(newValue => {
-        return ctClient.customObjects
-          .save({
-            container: sequence,
-            key: sequence,
-            value: newValue.value,
-            version: newValue.version,
-          })
-          .then(res => res.body.value)
-          .catch(() => getCustomerNumber(sequence));
-      });
-  }
 
   return {
-    find(params) {
-      const { filter, page, perPage, all, sortBy, sortAscending } = params;
-      let customersClient = ctClient.customers;
+    setCustomerNumber({ sequence, value, version }) {
+      return customObjectsService
+        .save({
+          container: sequence,
+          key: sequence,
+          value,
+          version,
+        })
+        .then(customObject => customObject.value);
+    },
 
-      if (all) {
-        customersClient = customersClient.all();
-      } else {
-        // Bug in CT SDK if you get 'all()' then you can't sort, otherwise you will
-        // get repeated results
-        customersClient = sortBy ? customersClient.sort(sortBy, sortAscending) : customersClient;
-        customersClient = page ? customersClient.page(page) : customersClient;
-        customersClient = perPage ? customersClient.perPage(page) : customersClient;
-      }
-      return customersClient
-        .where(filter)
-        .fetch()
-        .then(res => ({ results: res.body.results, total: res.body.total }));
+    getCustomerNumber(sequence) {
+      return customObjectsService
+        .find({
+          filter: `key="${sequence}"`,
+        })
+        .then(({ results }) => (results.length > 0 ? results[0] : { value: 0 }))
+        .then(lastValue => {
+          return this.setCustomerNumber({
+            sequence,
+            value: lastValue.value + 1,
+            version: lastValue.version,
+          }).catch(() => this.getCustomerNumber(sequence)); // We request a new one on error
+        });
     },
 
     signUp(customer) {
-      return getCustomerNumber(customersSequence)
+      return this.getCustomerNumber(customersSequence)
         .then(customerNumber => ({
           ...customer,
           customerNumber: customerNumber.toString(),
         }))
-        .then(customerToSave => ctClient.customers.save(customerToSave).then(res => res.body));
+        .then(this.save);
     },
 
     signIn(email, password, anonymousCartId) {
@@ -68,5 +55,7 @@ export default ({ commercetools, config }) => {
         });
       });
     },
+
+    ...commonsService,
   };
-};
+}

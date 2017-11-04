@@ -1,12 +1,10 @@
 import rp from 'request-promise';
 
-export default ({ config, logger, cache }) => {
-  logger.info(`CMS cache is ${config.get('CMS:CACHE_ENABLED') ? 'Enabled' : 'Disabled'}`);
+export default ({ isCacheEnabled, cmsUrl, logger, cache }) => {
+  logger.info(`CMS cache is ${isCacheEnabled ? 'Enabled' : 'Disabled'}`);
 
   return {
     getStory(slug, version, token) {
-      const isCacheEnabled = !!config.get('CMS:CACHE_ENABLED');
-
       return Promise.resolve().then(() => {
         if (isCacheEnabled) {
           if (version === 'draft') {
@@ -32,8 +30,6 @@ export default ({ config, logger, cache }) => {
     },
 
     getFromCms(slug, version, token) {
-      const cmsUrl = config.get('CMS:URL');
-
       return rp({
         baseUrl: cmsUrl,
         uri: slug,

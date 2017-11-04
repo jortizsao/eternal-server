@@ -9,7 +9,9 @@ describe('CMS', () => {
     const config = Config();
     const logger = Logger({ config });
     const cache = Cache({ logger });
-    const cmsService = CmsService({ config, logger, cache });
+    let isCacheEnabled = true;
+    const cmsUrl = 'http://thisismycms.com';
+    let cmsService = CmsService({ isCacheEnabled, cmsUrl, logger, cache });
     let story;
 
     beforeEach(() => {
@@ -19,12 +21,12 @@ describe('CMS', () => {
         slug: 'home',
         full_slug: 'en/home',
       };
-      spyOn(cmsService, 'getFromCms').and.returnValue(Promise.resolve(story));
     });
 
     describe('stories', () => {
       it('should return the story from cache if exists and it is the published version', done => {
         spyOn(cache, 'get').and.returnValue(Promise.resolve(story));
+        spyOn(cmsService, 'getFromCms').and.returnValue(Promise.resolve(story));
 
         cmsService
           .getStory('en/home', 'published', 'token')
@@ -38,6 +40,7 @@ describe('CMS', () => {
 
       it('should get the story from the cms if it is the published version and it is not in the cache, and store into the cache afterwards', done => {
         spyOn(cache, 'store');
+        spyOn(cmsService, 'getFromCms').and.returnValue(Promise.resolve(story));
 
         expect(cache.get('en/home', 'published')).toBeUndefined();
 
@@ -53,6 +56,7 @@ describe('CMS', () => {
 
       it('should not get the story from cache if it is the draft version of the story', done => {
         spyOn(cache, 'get');
+        spyOn(cmsService, 'getFromCms').and.returnValue(Promise.resolve(story));
 
         cmsService
           .getStory('en/home', 'draft', 'token')
@@ -66,6 +70,7 @@ describe('CMS', () => {
 
       it('should not store into the cache if it is the draft version of the story', done => {
         spyOn(cache, 'store');
+        spyOn(cmsService, 'getFromCms').and.returnValue(Promise.resolve(story));
 
         cmsService
           .getStory('en/home', 'draft', 'token')
@@ -81,9 +86,8 @@ describe('CMS', () => {
         const slug = 'en/home';
         const version = 'draft';
         const token = '123456789';
-        const host = config.get('CMS:URL');
 
-        nock(host)
+        nock(cmsUrl)
           .get(`/${slug}`)
           .query({
             version,
@@ -104,19 +108,11 @@ describe('CMS', () => {
 
     describe('cache', () => {
       it('should be enabled via config variable', done => {
-        const configGetSpy = spyOn(config, 'get');
-
-        configGetSpy.and.callFake(configVariable => {
-          if (configVariable === 'CMS:CACHE_ENABLED') {
-            return true;
-          } else {
-            // if the varialbe is not the one we are interested we use the original function
-            configGetSpy.and.callThrough();
-            return config.get(configVariable);
-          }
-        });
+        isCacheEnabled = true;
+        cmsService = CmsService({ isCacheEnabled, cmsUrl, logger, cache });
 
         spyOn(cache, 'get');
+        spyOn(cmsService, 'getFromCms').and.returnValue(Promise.resolve(story));
 
         cmsService
           .getStory('en/home', 'published', 'token')
@@ -127,19 +123,11 @@ describe('CMS', () => {
       });
 
       it('should be disabled via config variable', done => {
-        const configGetSpy = spyOn(config, 'get');
-
-        configGetSpy.and.callFake(configVariable => {
-          if (configVariable === 'CMS:CACHE_ENABLED') {
-            return false;
-          } else {
-            // if the variable is not the one we are interested we use the original function
-            configGetSpy.and.callThrough();
-            return config.get(configVariable);
-          }
-        });
+        isCacheEnabled = false;
+        cmsService = CmsService({ isCacheEnabled, cmsUrl, logger, cache });
 
         spyOn(cache, 'get');
+        spyOn(cmsService, 'getFromCms').and.returnValue(Promise.resolve(story));
 
         cmsService
           .getStory('en/home', 'published', 'token')

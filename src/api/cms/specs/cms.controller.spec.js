@@ -11,7 +11,9 @@ describe('CMS', () => {
       getStory: () => {},
       clearCache: () => {},
     };
-    const cmsController = CmsController({ config, logger, cmsService });
+    const privateToken = 'privateAccessToken';
+    const publicToken = 'publicAccessToken';
+    const cmsController = CmsController({ privateToken, publicToken, logger, cmsService });
     let next;
 
     beforeEach(() => {
@@ -43,7 +45,7 @@ describe('CMS', () => {
         const req = {
           query: {
             version: 'draft',
-            token: 'publicAccessToken', // This value has been set in the config test env
+            token: 'publicAccessToken',
           },
           params: ['home'],
         };
@@ -61,7 +63,7 @@ describe('CMS', () => {
         const req = {
           query: {
             version: 'draft',
-            token: 'privateAccessToken', // This value has been set in the config test env
+            token: 'privateAccessToken',
           },
           params: ['en/home'],
         };
@@ -91,7 +93,7 @@ describe('CMS', () => {
         const req = {
           query: {
             version: 'published',
-            token: 'privateAccessToken', // This value has been set in the config test env
+            token: 'privateAccessToken',
           },
           params: ['en/home'],
         };
@@ -121,7 +123,7 @@ describe('CMS', () => {
         const req = {
           query: {
             version: 'published',
-            token: 'publicAccessToken', // This value has been set in the config test env
+            token: 'publicAccessToken',
           },
           params: ['en/home'],
         };
@@ -197,7 +199,7 @@ describe('CMS', () => {
       it('should clear the cache using the private token', () => {
         const req = {
           query: {
-            token: 'privateAccessToken', // This value has been set in the config test env
+            token: 'privateAccessToken',
           },
         };
 
@@ -211,7 +213,7 @@ describe('CMS', () => {
       it('should not clear the cache using the public token', () => {
         const req = {
           query: {
-            token: 'publicAccessToken', // This value has been set in the config test env
+            token: 'publicAccessToken',
           },
         };
 
@@ -241,7 +243,7 @@ describe('CMS', () => {
       it('should handle unexpected errors when clearing the cache', () => {
         const req = {
           query: {
-            token: 'privateAccessToken', // This value has been set in the config test env
+            token: 'privateAccessToken',
           },
         };
 
