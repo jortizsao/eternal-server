@@ -10,13 +10,7 @@ addons:
       secure: $SONARCLOUD_TOKEN
 script:
   - NODE_ENV=test npm test
-  - sonar-scanner \
-    -Dsonar.branch.name=$TRAVIS_BRANCH \
-    -Dsonar.projectKey=$SONARCLOUD_PROJECT_KEY \
-    -Dsonar.projectName=$SONARCLOUD_PROJECT_NAME \
-    -Dsonar.sources=src \
-    -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
-    -Dsonar.exclusions=**/*.spec.js
+  - sonar-scanner -Dsonar.branch.name=$TRAVIS_BRANCH -Dsonar.projectKey=$SONARCLOUD_PROJECT_KEY -Dsonar.projectName=$SONARCLOUD_PROJECT_NAME -Dsonar.sources=src -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info -Dsonar.exclusions=**/*.spec.js
 cache:
   directories:
     - '$HOME/.sonar/cache'
