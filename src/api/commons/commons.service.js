@@ -33,7 +33,7 @@ export default function ({ commercetools, entity }) {
         .then(res => res.body);
     },
 
-    find({ filter, page, perPage, all, sortBy, sortAscending }) {
+    find({ filter, page, perPage, all, sortBy, sortAscending, expand }) {
       let entityClient = ctClient[entity];
 
       if (all) {
@@ -43,8 +43,11 @@ export default function ({ commercetools, entity }) {
         // get repeated results
         entityClient = sortBy ? entityClient.sort(sortBy, sortAscending) : entityClient;
         entityClient = page ? entityClient.page(page) : entityClient;
-        entityClient = perPage ? entityClient.perPage(page) : entityClient;
+        entityClient = perPage ? entityClient.perPage(perPage) : entityClient;
       }
+
+      entityClient = expand ? entityClient.expand(expand) : entityClient;
+
       return entityClient
         .where(filter)
         .fetch()
