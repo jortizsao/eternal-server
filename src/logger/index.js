@@ -1,5 +1,4 @@
 import winston from 'winston';
-import { Papertrail } from 'winston-papertrail';
 
 export default ({ config }) => {
   const level = config.get('LOGGER:LEVEL');
@@ -31,19 +30,6 @@ export default ({ config }) => {
         prettyPrint: true,
       }),
     );
-
-    if (config.get('PAPERTRAIL') && config.get('PAPERTRAIL:HOST')) {
-      const papertrailConfig = {
-        level,
-        timestamp: true,
-        colorize: true,
-        host: config.get('PAPERTRAIL:HOST'),
-        port: config.get('PAPERTRAIL:PORT'),
-      };
-
-      transports.push(new Papertrail(papertrailConfig));
-      exceptionHandlers.push(new Papertrail(papertrailConfig));
-    }
 
     logger = new winston.Logger({
       transports,
