@@ -8,10 +8,8 @@ addons:
     organization: $SONARCLOUD_ORGANIZATION_KEY
     token:
       secure: $SONARCLOUD_TOKEN
-    branches:
-      - feature/
-      - develop
-      - master
+    github_token:
+      secure: $SONARCLOUD_GITHUB_TOKEN
 script:
   - NODE_ENV=test npm test
   - sonar-scanner
