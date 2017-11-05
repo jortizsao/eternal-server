@@ -3,19 +3,32 @@ node_js:
   - 8
 services:
   - docker
+addons:
+  sonarcloud:
+    organization: $SONARCLOUD_ORGANIZATION_KEY
+    token:
+      secure: $SONARCLOUD_TOKEN
+    github_token:
+      secure: $SONARCLOUD_GITHUB_TOKEN
 script:
   - NODE_ENV=test npm test
+  - sonar-scanner
+cache:
+  directories:
+    - '$HOME/.sonar/cache'
 after_success:
   - npm install -g codeclimate-test-reporter
+  - npm install -g codacy-coverage
   - codeclimate-test-reporter < coverage/lcov.info
+  - codacy-coverage < coverage/lcov.info
   - if [ -n "$TRAVIS_TAG" ]; then
-    docker login -u $DOCKER_USER -p $DOCKER_PASSWORD;
-    docker build -t $DOCKER_REPO:$TRAVIS_COMMIT .;
-    docker tag $DOCKER_REPO:$TRAVIS_COMMIT $DOCKER_REPO:$TRAVIS_TAG;
-    docker tag $DOCKER_REPO:$TRAVIS_COMMIT $DOCKER_REPO:latest;
-    docker push $DOCKER_REPO;
-    npm install -g ecs-deploy;
-    AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY AWS_SECRET_ACCESS_KEY=$AWS_SECRET_KEY
-    REGION=$AWS_REGION CLUSTER=$AWS_ECS_CLUSTER SERVICE=$AWS_ECS_SERVICE CONTAINER=$AWS_ECS_CONTAINER
-    IMAGE=$DOCKER_REPO IMAGE_TAG=$TRAVIS_TAG ecs-deploy;
+      docker login -u $DOCKER_USER -p $DOCKER_PASSWORD;
+      docker build -t $DOCKER_REPO:$TRAVIS_COMMIT .;
+      docker tag $DOCKER_REPO:$TRAVIS_COMMIT $DOCKER_REPO:$TRAVIS_TAG;
+      docker tag $DOCKER_REPO:$TRAVIS_COMMIT $DOCKER_REPO:latest;
+      docker push $DOCKER_REPO;
+      npm install -g ecs-deploy;
+      AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY AWS_SECRET_ACCESS_KEY=$AWS_SECRET_KEY
+      REGION=$AWS_REGION CLUSTER=$AWS_ECS_CLUSTER SERVICE=$AWS_ECS_SERVICE CONTAINER=$AWS_ECS_CONTAINER
+      IMAGE=$DOCKER_REPO IMAGE_TAG=$TRAVIS_TAG ecs-deploy;
     fi
