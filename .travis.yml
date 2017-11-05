@@ -3,8 +3,17 @@ node_js:
   - 8
 services:
   - docker
+addons:
+  sonarcloud:
+    organization: $SONARCLOUD_ORGANIZATION_KEY
+    token:
+      secure: $SONARCLOUD_TOKEN
 script:
   - NODE_ENV=test npm test
+  - sonar-scanner
+cache:
+  directories:
+    - '$HOME/.sonar/cache'
 after_success:
   - npm install -g codeclimate-test-reporter
   - npm install -g codacy-coverage
