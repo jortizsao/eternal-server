@@ -2,6 +2,10 @@
   "name": "eternal-server",
   "version": "1.0.0",
   "description": "Ecofriendly ecommerce site (Backend)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jortizsao/eternal-server-expressjs"
+  },
   "main": "index.js",
   "engines": {
     "node": ">= 8.1.0",
