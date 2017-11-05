@@ -3,7 +3,7 @@ FROM node:8
 ENV APP_HOME /app
 
 # Install requirements for yarn
-RUN apt-get update && apt-get install -y --no-install-recommends apt-transport-https=1.0.9.3
+RUN apt-get update && apt-get install -y --no-install-recommends apt-transport-https=1.4.8
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install yarn
