@@ -9,7 +9,9 @@ addons:
     token:
       secure: $SONARCLOUD_TOKEN
     branches:
-      - /.*/
+      - feature/
+      - develop
+      - master
 script:
   - NODE_ENV=test npm test
   - sonar-scanner
