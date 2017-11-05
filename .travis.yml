@@ -12,7 +12,6 @@ script:
   - NODE_ENV=test npm test
   - sonar-scanner \
     -Dsonar.branch.name=$TRAVIS_BRANCH \
-    -Dsonar.projectVersion=$INITIAL_VERSION \
     -Dsonar.analysis.buildNumber=$TRAVIS_BUILD_NUMBER \
     -Dsonar.analysis.pipeline=$TRAVIS_BUILD_NUMBER \
     -Dsonar.analysis.sha1=$TRAVIS_COMMIT \
