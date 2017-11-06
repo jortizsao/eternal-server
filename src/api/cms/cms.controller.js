@@ -16,13 +16,7 @@ export default ({ privateToken, publicToken, logger, cmsService }) => {
     return cmsService
       .getStory(slug, version, token)
       .then(story => res.json(story))
-      .catch(err => {
-        if (!err.statusCode) {
-          next(err);
-        } else {
-          res.sendStatus(err.statusCode);
-        }
-      });
+      .catch(err => (err.statusCode ? res.sendStatus(err.statusCode) : next(err)));
   };
 
   controller.clearCache = (req, res, next) => {

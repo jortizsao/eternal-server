@@ -20,9 +20,7 @@ export default function ({
 
     getCustomerNumber(sequence) {
       return customObjectsService
-        .find({
-          filter: `key="${sequence}"`,
-        })
+        .find({ filter: `key="${sequence}"` })
         .then(({ results }) => (results.length > 0 ? results[0] : { value: 0 }))
         .then(lastValue => {
           return this.setCustomerNumber({
@@ -35,10 +33,7 @@ export default function ({
 
     signUp(customer) {
       return this.getCustomerNumber(customersSequence)
-        .then(customerNumber => ({
-          ...customer,
-          customerNumber: customerNumber.toString(),
-        }))
+        .then(customerNumber => ({ ...customer, customerNumber: customerNumber.toString() }))
         .then(this.save);
     },
 
