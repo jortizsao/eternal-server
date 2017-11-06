@@ -117,7 +117,6 @@ describe('Customers', () => {
               firstName: 'javier',
               lastName: 'ortiz',
               email: 'javier.ortizsaorin@gmail.com',
-              password: undefined,
             },
           });
         })
@@ -150,7 +149,6 @@ describe('Customers', () => {
         customer: {
           id: 'id1',
           email: 'javier.ortizsaorin@gmail.com',
-          password: undefined,
         },
       });
     });
