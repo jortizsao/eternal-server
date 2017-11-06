@@ -12,9 +12,10 @@ addons:
       secure: $SONARCLOUD_GITHUB_TOKEN
     branches:
       - develop
+      - master
 script:
   - NODE_ENV=test npm test
-  - sonar-scanner -Dsonar.projectKey=$SONARCLOUD_PROJECT_KEY -Dsonar.projectName=$SONARCLOUD_PROJECT_NAME -Dsonar.sources=src -Dsonar.exclusions=**/*.spec.js -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info -Dsonar.branch.name=$TRAVIS_BRANCH -Dsonar.analysis.buildNumber=$TRAVIS_BUILD_NUMBER -Dsonar.analysis.pipeline=$TRAVIS_BUILD_NUMBER -Dsonar.analysis.sha1=$TRAVIS_PULL_REQUEST_SHA -Dsonar.analysis.prNumber=$TRAVIS_PULL_REQUEST -Dsonar.analysis.repository=$TRAVIS_REPO_SLUG 
+  - sonar-scanner -Dsonar.projectKey=$SONARCLOUD_PROJECT_KEY -Dsonar.projectName=$SONARCLOUD_PROJECT_NAME -Dsonar.sources=src -Dsonar.exclusions=**/*.spec.js -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info -Dsonar.branch.name=$TRAVIS_BRANCH -Dsonar.analysis.buildNumber=$TRAVIS_BUILD_NUMBER -Dsonar.analysis.pipeline=$TRAVIS_BUILD_NUMBER -Dsonar.analysis.sha1=$TRAVIS_PULL_REQUEST_SHA -Dsonar.analysis.prNumber=$TRAVIS_PULL_REQUEST -Dsonar.analysis.repository=$TRAVIS_REPO_SLUG
 cache:
   directories:
     - '$HOME/.sonar/cache'
