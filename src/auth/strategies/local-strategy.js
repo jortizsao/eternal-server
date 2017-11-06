@@ -11,7 +11,7 @@ export default ({ utils, customersService }) => {
       if (utils.commons.isStringEmpty(email) || utils.commons.isStringEmpty(password)) {
         return done(null, false);
       } else {
-        return customersService
+        customersService
           .signIn(email, password)
           .then(customer => done(null, customer))
           .catch(err => done(err));
