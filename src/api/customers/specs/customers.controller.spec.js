@@ -2,6 +2,7 @@ import CustomersController from '../customers.controller';
 import CustomersService from '../customers.service';
 import CustomersUtils from '../customers.utils';
 import CommonsService from '../../commons/commons.service';
+import JwtService from '../../../authorize/services/jwt.service';
 import Config from '../../../config';
 import Utils from '../../../utils';
 import { httpResponse as res } from '../../../../spec/helpers/mocks';
@@ -18,7 +19,12 @@ describe('Customers', () => {
     });
     const utils = Utils();
     const customersUtils = CustomersUtils({ utils });
-    const customersController = CustomersController({ customersUtils, customersService });
+    const authorizeService = JwtService({ passphrase: 'passphrase', expiresIn: 86400 }); // 1 day
+    const customersController = CustomersController({
+      customersUtils,
+      customersService,
+      authorizeService,
+    });
     let next;
 
     beforeEach(() => {
@@ -89,6 +95,7 @@ describe('Customers', () => {
       const req = {
         body: customer,
       };
+      const baseTime = new Date('1982-02-11T00:00:00.000Z');
 
       spyOn(customersService, 'signUp').and.returnValue(
         Promise.resolve({
@@ -106,7 +113,18 @@ describe('Customers', () => {
           results: [],
         }),
       );
+      jasmine.clock().install();
+      jasmine.clock().mockDate(baseTime);
 
+      // JWT Token for the payload
+      // {
+      //   "id": "id1",
+      //   "firstName": "javier",
+      //   "lastName": "ortiz saorin",
+      //   "email": "javier.ortizsaorin@gmail.com",
+      //   "iat": 382233600,
+      //   "exp": 382320000
+      // }
       customersController
         .signUp(req, res, next)
         .then(() => {
@@ -118,7 +136,10 @@ describe('Customers', () => {
               lastName: 'ortiz',
               email: 'javier.ortizsaorin@gmail.com',
             },
+            token:
+              'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImlkMSIsImZpcnN0TmFtZSI6ImphdmllciIsImxhc3ROYW1lIjoib3J0aXoiLCJlbWFpbCI6Imphdmllci5vcnRpenNhb3JpbkBnbWFpbC5jb20iLCJpYXQiOjM4MjIzMzYwMCwiZXhwIjozODIzMjAwMDB9.8hzDPL46bauAePpTeK0NK2F2_P3SmxMJ3ZpjDyZy9Qs',
           });
+          jasmine.clock().uninstall();
         })
         .then(done, done.fail);
     });
@@ -127,6 +148,9 @@ describe('Customers', () => {
       const req1 = {
         user: undefined,
       };
+      const baseTime = new Date('1982-02-11T00:00:00.000Z');
+      jasmine.clock().install();
+      jasmine.clock().mockDate(baseTime);
 
       customersController.signIn(req1, res);
 
@@ -135,8 +159,10 @@ describe('Customers', () => {
 
       const user = {
         id: 'id1',
+        firstName: 'javier',
+        lastName: 'ortiz',
         email: 'javier.ortizsaorin@gmail.com',
-        password: '12345',
+        password: '1234123djaddfadkadfnmñ',
       };
 
       const req2 = {
@@ -145,12 +171,27 @@ describe('Customers', () => {
 
       customersController.signIn(req2, res);
 
+      // JWT Token for the payload
+      // {
+      //   "id": "id1",
+      //   "firstName": "javier",
+      //   "lastName": "ortiz saorin",
+      //   "email": "javier.ortizsaorin@gmail.com",
+      //   "iat": 382233600,
+      //   "exp": 382320000
+      // }
       expect(res.json).toHaveBeenCalledWith({
         customer: {
           id: 'id1',
+          firstName: 'javier',
+          lastName: 'ortiz',
           email: 'javier.ortizsaorin@gmail.com',
         },
+        token:
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImlkMSIsImZpcnN0TmFtZSI6ImphdmllciIsImxhc3ROYW1lIjoib3J0aXoiLCJlbWFpbCI6Imphdmllci5vcnRpenNhb3JpbkBnbWFpbC5jb20iLCJpYXQiOjM4MjIzMzYwMCwiZXhwIjozODIzMjAwMDB9.8hzDPL46bauAePpTeK0NK2F2_P3SmxMJ3ZpjDyZy9Qs',
       });
+
+      jasmine.clock().uninstall();
     });
   });
 });

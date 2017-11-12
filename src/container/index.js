@@ -3,8 +3,9 @@ import Utils from '../utils';
 import Config from '../config';
 import Logger from '../logger';
 import CommerceTools from '../commercetools';
-import AuthMiddleware from '../auth/middlewares/auth.middleware';
-import AuthLocalStrategy from '../auth/strategies/local-strategy';
+import AuthenticateLocalMiddleware from '../authenticate/middlewares/local.middleware';
+import AuthenticateLocalStrategy from '../authenticate/strategies/local.strategy';
+import AuthorizeJwtService from '../authorize/services/jwt.service';
 import CmsCache from '../api/cms/cms.cache';
 import CustomersService from '../api/customers/customers.service';
 import CmsController from '../api/cms/cms.controller';
@@ -19,9 +20,9 @@ export default function () {
     return CommonsService({ commercetools: _container.resolve('commercetools'), entity });
   }
 
-  function getAuthMiddlewareParams(_container) {
+  function getAuthenticateMiddlewareParams(_container) {
     return {
-      authStrategies: [_container.resolve('authLocalStrategy')],
+      authenticateStrategy: _container.resolve('authenticateStrategy'),
     };
   }
 
@@ -32,6 +33,7 @@ export default function () {
       customersSequence: config.get('COMMERCE_TOOLS:SEQUENCES:CUSTOMERS'),
       commercetools: _container.resolve('commercetools'),
       commonsService: getCommonsService(_container, 'customers'),
+      authorizeService: _container.resolve('commercetools'),
     };
   }
 
@@ -69,6 +71,15 @@ export default function () {
     };
   }
 
+  function getAuthorizeJwtServiceParams(_container) {
+    const config = _container.resolve('config');
+
+    return {
+      passphrase: config.get('TOKEN:SECRET'),
+      expiresIn: config.get('TOKEN:MAX_AGE_SECONDS'),
+    };
+  }
+
   function getSingleton(instance, injectParamsFunction) {
     return injectParamsFunction
       ? asFunction(instance)
@@ -92,8 +103,12 @@ export default function () {
     config: getSingleton(Config),
     logger: getSingleton(Logger),
     commercetools: getSingleton(CommerceTools, getCommerceToolsParams),
-    authMiddleware: getSingleton(AuthMiddleware, getAuthMiddlewareParams),
-    authLocalStrategy: getSingleton(AuthLocalStrategy),
+    authenticateMiddleware: getSingleton(
+      AuthenticateLocalMiddleware,
+      getAuthenticateMiddlewareParams,
+    ),
+    authenticateStrategy: getSingleton(AuthenticateLocalStrategy),
+    authorizeService: getSingleton(AuthorizeJwtService, getAuthorizeJwtServiceParams),
     cache: getSingleton(CmsCache),
     customersService: getSingleton(CustomersService, getCustomersServiceParams),
     cmsController: getSingleton(CmsController, getCmsControllerParams),

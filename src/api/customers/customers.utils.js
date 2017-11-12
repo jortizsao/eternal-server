@@ -1,3 +1,4 @@
+import { pick } from 'lodash/fp';
 import { ValidationError } from '../../errors';
 
 export default ({ utils }) => {
@@ -40,6 +41,10 @@ export default ({ utils }) => {
       } else {
         throw new ValidationError('Please fill all required fields');
       }
+    },
+
+    getTokenPayload(customer) {
+      return pick(['id', 'firstName', 'lastName', 'email'], customer);
     },
   };
 };
