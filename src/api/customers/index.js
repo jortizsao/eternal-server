@@ -1,9 +1,9 @@
 export default ({ router, container }) => {
   const customersController = container.resolve('customersController');
-  const authMiddleware = container.resolve('authMiddleware');
+  const authenticateMiddleware = container.resolve('authenticateMiddleware');
 
   router.post('/signUp', customersController.signUp);
-  router.post('/signIn', authMiddleware, customersController.signIn);
+  router.post('/signIn', authenticateMiddleware, customersController.signIn);
 
   return router;
 };

@@ -1,8 +1,15 @@
 import { pipe, unset, pick, get, first } from 'lodash/fp';
 
-export default ({ customersUtils, customersService }) => {
+export default ({ customersUtils, customersService, authorizeService }) => {
+  function getCustomerResponse(customer) {
+    return {
+      customer,
+      token: pipe(customersUtils.getTokenPayload, authorizeService.getAccessToken)(customer),
+    };
+  }
+
   return {
-    signUp: (req, res, next) => {
+    signUp(req, res, next) {
       try {
         const validCustomer = customersUtils.getValidCustomerToRegister(
           pick(['firstName', 'lastName', 'email', 'password', 'confirmPassword'], req.body),
@@ -18,8 +25,8 @@ export default ({ customersUtils, customersService }) => {
 
             return customersService
               .signUp(validCustomer)
-              .then(unset('customer.password'))
-              .then(customer => res.json(customer));
+              .then(pipe(get('customer'), unset('password')))
+              .then(customer => res.json(getCustomerResponse(customer)));
           })
           .catch(next);
       } catch (err) {
@@ -28,7 +35,13 @@ export default ({ customersUtils, customersService }) => {
     },
 
     signIn(req, res) {
-      return req.user ? res.json({ customer: unset('password', req.user) }) : res.sendStatus(401);
+      if (req.user) {
+        const customer = unset('password', req.user);
+
+        return res.json(getCustomerResponse(customer));
+      } else {
+        return res.sendStatus(401);
+      }
     },
   };
 };

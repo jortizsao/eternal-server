@@ -164,5 +164,24 @@ describe('Customers', () => {
         customersUtils.getValidCustomerToRegister(customerPasswordsNotMatch);
       }).toThrow(new ValidationError("Passwords fields don't match"));
     });
+
+    it('should get the token payload from the customer', () => {
+      const customer = {
+        id: 'id1',
+        firstName: 'javier',
+        lastName: 'ortiz',
+        email: 'javier.ortizsaorin@gmail.com',
+        password: 'test',
+        addresses: [],
+        customerNumber: 'cust1',
+      };
+
+      expect(customersUtils.getTokenPayload(customer)).toEqual({
+        id: 'id1',
+        firstName: 'javier',
+        lastName: 'ortiz',
+        email: 'javier.ortizsaorin@gmail.com',
+      });
+    });
   });
 });

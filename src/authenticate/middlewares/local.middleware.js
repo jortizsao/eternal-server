@@ -1,7 +1,7 @@
 import passport from 'passport';
 
-export default ({ authStrategies }) => {
-  authStrategies.forEach(strategy => passport.use(strategy));
+export default ({ authenticateStrategy }) => {
+  passport.use(authenticateStrategy);
 
   return (req, res, next) => {
     passport.authenticate('local', (err, user) => {
