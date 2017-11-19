@@ -16,8 +16,7 @@ describe('Jwt Service', () => {
   it('should get an access token', () => {
     const payload = {
       id: 'id1',
-      firstName: 'javier',
-      lastName: 'ortiz saorin',
+      email: 'javier.ortizsaorin@gmail.com',
     };
     const baseTime = new Date('1982-02-11T00:00:00.000Z');
 
@@ -27,13 +26,12 @@ describe('Jwt Service', () => {
     // JWT Token for the payload
     // {
     //   "id": "id1",
-    //   "firstName": "javier",
-    //   "lastName": "ortiz saorin",
+    //   "email": "javier.ortizsaorin@gmail.com",
     //   "iat": 382233600,
     //   "exp": 382320000
     // }
     expect(jwtService.getAccessToken(payload)).toBe(
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImlkMSIsImZpcnN0TmFtZSI6ImphdmllciIsImxhc3ROYW1lIjoib3J0aXogc2FvcmluIiwiaWF0IjozODIyMzM2MDAsImV4cCI6MzgyMzIwMDAwfQ.OQATB0jo0Zzz7DVWvo066zQ-If6t86FgzVBu8BH389s',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImlkMSIsImVtYWlsIjoiamF2aWVyLm9ydGl6c2FvcmluQGdtYWlsLmNvbSIsImlhdCI6MzgyMjMzNjAwLCJleHAiOjM4MjMyMDAwMH0.UoW1NDVFcI8E4Rf6ILyHqWG9JFQ5-m45KTaRlEs57XU',
     );
     jasmine.clock().uninstall();
   });

@@ -44,7 +44,7 @@ export default ({ utils }) => {
     },
 
     getTokenPayload(customer) {
-      return pick(['id', 'firstName', 'lastName', 'email'], customer);
+      return pick(['id', 'email'], customer);
     },
   };
 };

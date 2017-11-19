@@ -119,8 +119,6 @@ describe('Customers', () => {
       // JWT Token for the payload
       // {
       //   "id": "id1",
-      //   "firstName": "javier",
-      //   "lastName": "ortiz saorin",
       //   "email": "javier.ortizsaorin@gmail.com",
       //   "iat": 382233600,
       //   "exp": 382320000
@@ -137,7 +135,7 @@ describe('Customers', () => {
               email: 'javier.ortizsaorin@gmail.com',
             },
             token:
-              'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImlkMSIsImZpcnN0TmFtZSI6ImphdmllciIsImxhc3ROYW1lIjoib3J0aXoiLCJlbWFpbCI6Imphdmllci5vcnRpenNhb3JpbkBnbWFpbC5jb20iLCJpYXQiOjM4MjIzMzYwMCwiZXhwIjozODIzMjAwMDB9.8hzDPL46bauAePpTeK0NK2F2_P3SmxMJ3ZpjDyZy9Qs',
+              'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImlkMSIsImVtYWlsIjoiamF2aWVyLm9ydGl6c2FvcmluQGdtYWlsLmNvbSIsImlhdCI6MzgyMjMzNjAwLCJleHAiOjM4MjMyMDAwMH0.3maGqzyZRqsX0VOrlz-6ZhkWbh9XJC-UPJx9ctoSoO8',
           });
           jasmine.clock().uninstall();
         })
@@ -174,8 +172,6 @@ describe('Customers', () => {
       // JWT Token for the payload
       // {
       //   "id": "id1",
-      //   "firstName": "javier",
-      //   "lastName": "ortiz saorin",
       //   "email": "javier.ortizsaorin@gmail.com",
       //   "iat": 382233600,
       //   "exp": 382320000
@@ -188,7 +184,7 @@ describe('Customers', () => {
           email: 'javier.ortizsaorin@gmail.com',
         },
         token:
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImlkMSIsImZpcnN0TmFtZSI6ImphdmllciIsImxhc3ROYW1lIjoib3J0aXoiLCJlbWFpbCI6Imphdmllci5vcnRpenNhb3JpbkBnbWFpbC5jb20iLCJpYXQiOjM4MjIzMzYwMCwiZXhwIjozODIzMjAwMDB9.8hzDPL46bauAePpTeK0NK2F2_P3SmxMJ3ZpjDyZy9Qs',
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImlkMSIsImVtYWlsIjoiamF2aWVyLm9ydGl6c2FvcmluQGdtYWlsLmNvbSIsImlhdCI6MzgyMjMzNjAwLCJleHAiOjM4MjMyMDAwMH0.3maGqzyZRqsX0VOrlz-6ZhkWbh9XJC-UPJx9ctoSoO8',
       });
 
       jasmine.clock().uninstall();
