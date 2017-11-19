@@ -178,8 +178,6 @@ describe('Customers', () => {
 
       expect(customersUtils.getTokenPayload(customer)).toEqual({
         id: 'id1',
-        firstName: 'javier',
-        lastName: 'ortiz',
         email: 'javier.ortizsaorin@gmail.com',
       });
     });
