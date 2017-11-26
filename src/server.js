@@ -35,7 +35,7 @@ function initErrorRoutes({ app, logger }) {
     }
 
     logger.error(err.stack);
-    res.sendStatus(500);
+    return res.sendStatus(500);
   });
 }
 
