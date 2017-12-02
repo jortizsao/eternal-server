@@ -5,6 +5,7 @@ import compression from 'compression';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import passport from 'passport';
+import { Engine as ApolloEngine } from 'apollo-engine';
 import routes from './routes';
 import Container from './container';
 
@@ -43,6 +44,14 @@ function initModulesServerRoutes({ app, container }) {
   routes({ app, container });
 }
 
+function initApolloEngine({ app, apiKey }) {
+  if (process.env.NODE_ENV === 'production') {
+    const engine = new ApolloEngine({ engineConfig: { apiKey } });
+    engine.start();
+    app.use(engine.expressMiddleware());
+  }
+}
+
 function getServer() {
   const container = Container();
   const config = container.resolve('config');
@@ -50,6 +59,7 @@ function getServer() {
 
   const app = express();
 
+  initApolloEngine({ app, apiKey: config.get('APOLLO:ENGINE:KEY') });
   initMiddleware({ app });
   initModulesServerRoutes({ app, container });
   initErrorRoutes({ app });
