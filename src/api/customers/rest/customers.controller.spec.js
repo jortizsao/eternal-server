@@ -1,4 +1,4 @@
-import CustomersController from '../customers.controller';
+import CustomersController from './customers.controller';
 import CustomersService from '../customers.service';
 import CustomersUtils from '../customers.utils';
 import CommonsService from '../../commons/commons.service';

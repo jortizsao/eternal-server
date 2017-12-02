@@ -1,6 +1,4 @@
-export default ({ router, container }) => {
-  const cmsController = container.resolve('cmsController');
-
+export default ({ router, cmsController }) => {
   router.get(/^\/stories\/(.+)/, cmsController.getStory);
   router.post('/clearCache', cmsController.clearCache);
 
