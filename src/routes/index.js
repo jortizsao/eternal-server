@@ -25,6 +25,7 @@ export default ({ app, container }) => {
       context: {
         customersService,
       },
+      tracing: process.env.NODE_ENV === 'production',
     }),
   );
   app.get('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
