@@ -89,7 +89,7 @@ export default function () {
   }
 
   container.loadModules(
-    ['app/api/*/*.controller.js', 'app/api/*/*.service.js', 'app/api/*/*.utils.js'],
+    ['app/api/**/*.controller.js', 'app/api/**/*.service.js', 'app/api/*/*.utils.js'],
     {
       formatName: 'camelCase',
       registrationOptions: {
