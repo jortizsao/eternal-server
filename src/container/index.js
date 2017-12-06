@@ -68,6 +68,7 @@ export default function () {
       projectKey: config.get('COMMERCE_TOOLS:PROJECT_KEY'),
       host: config.get('COMMERCE_TOOLS:API_HOST'),
       oauthHost: config.get('COMMERCE_TOOLS:OAUTH_URL'),
+      concurrency: config.get('COMMERCE_TOOLS:CONCURRENCY'),
     };
   }
 

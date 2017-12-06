@@ -1,23 +1,33 @@
 export default function ({ commercetools, entity }) {
-  const ctClient = commercetools.ctClient;
+  const ctClient = commercetools.client;
+  const ctRequestBuilder = commercetools.requestBuilder;
 
   function updateEntity({ id, version, actions }) {
-    return ctClient[entity].byId(id).update({
-      version,
-      actions,
+    return ctClient.execute({
+      uri: ctRequestBuilder[entity].parse({ id }).build(),
+      method: 'POST',
+      body: { version, actions },
     });
   }
 
   return {
     byId(id) {
-      return ctClient[entity]
-        .byId(id)
-        .fetch()
+      return ctClient
+        .execute({
+          uri: ctRequestBuilder[entity].parse({ id }).build(),
+          method: 'GET',
+        })
         .then(res => res.body);
     },
 
     save(params) {
-      return ctClient[entity].save(params).then(res => res.body);
+      return ctClient
+        .execute({
+          uri: ctRequestBuilder[entity].build(),
+          method: 'POST',
+          body: params,
+        })
+        .then(res => res.body);
     },
 
     update({ id, version, actions }) {
@@ -33,24 +43,20 @@ export default function ({ commercetools, entity }) {
         .then(res => res.body);
     },
 
-    find({ filter, page, perPage, all, sortBy, sortAscending, expand }) {
-      let entityClient = ctClient[entity];
+    find({ where, page, perPage, sortBy, sortAscending, expand }) {
+      let requestBuilder = ctRequestBuilder[entity];
 
-      if (all) {
-        entityClient = entityClient.all();
-      } else {
-        // Bug in CT SDK if you get 'all()' then you can't sort, otherwise you will
-        // get repeated results
-        entityClient = sortBy ? entityClient.sort(sortBy, sortAscending) : entityClient;
-        entityClient = page ? entityClient.page(page) : entityClient;
-        entityClient = perPage ? entityClient.perPage(perPage) : entityClient;
-      }
+      requestBuilder = where ? requestBuilder.where(where) : requestBuilder;
+      requestBuilder = sortBy ? requestBuilder.sort(sortBy, sortAscending) : requestBuilder;
+      requestBuilder = page ? requestBuilder.page(page) : requestBuilder;
+      requestBuilder = perPage ? requestBuilder.perPage(perPage) : requestBuilder;
+      requestBuilder = expand ? requestBuilder.expand(expand) : requestBuilder;
 
-      entityClient = expand ? entityClient.expand(expand) : entityClient;
-
-      return entityClient
-        .where(filter)
-        .fetch()
+      return ctClient
+        .execute({
+          uri: requestBuilder.build(),
+          method: 'GET',
+        })
         .then(res => ({ results: res.body.results, total: res.body.total }));
     },
   };

@@ -1,18 +1,29 @@
-import { SphereClient, Rest } from 'sphere-node-sdk';
+import { createClient } from '@commercetools/sdk-client';
+import { createAuthMiddlewareForClientCredentialsFlow } from '@commercetools/sdk-middleware-auth';
+import { createHttpMiddleware } from '@commercetools/sdk-middleware-http';
+import { createQueueMiddleware } from '@commercetools/sdk-middleware-queue';
+import { createRequestBuilder } from '@commercetools/api-request-builder';
 
-export default ({ clientId, clientSecret, projectKey, host, oauthHost }) => {
-  const ctConfig = {
-    config: {
-      client_id: clientId,
-      client_secret: clientSecret,
-      project_key: projectKey,
-    },
-    host,
-    oauth_host: oauthHost,
-  };
+export default ({ clientId, clientSecret, projectKey, host, oauthHost, concurrency = 10 }) => {
+  const client = createClient({
+    middlewares: [
+      createAuthMiddlewareForClientCredentialsFlow({
+        host: oauthHost,
+        projectKey,
+        credentials: {
+          clientId,
+          clientSecret,
+        },
+      }),
+      createQueueMiddleware({ concurrency }),
+      createHttpMiddleware({ host }),
+    ],
+  });
+
+  const requestBuilder = createRequestBuilder({ projectKey });
 
   return {
-    ctClient: new SphereClient(ctConfig),
-    restCTClient: new Rest(ctConfig),
+    client,
+    requestBuilder,
   };
 };
