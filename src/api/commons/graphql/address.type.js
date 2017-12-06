@@ -1,4 +1,4 @@
-const Address = `
+const address = `
   type Address {
     id: ID!
     title: String
@@ -25,4 +25,4 @@ const Address = `
     externalId: String
   }`;
 
-export default Address;
+export default address;

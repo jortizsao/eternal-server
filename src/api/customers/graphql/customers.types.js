@@ -7,11 +7,22 @@ const Customer = `
     email: String
     firstName: String
     lastName: String
+    middleName: String
+    title: String
+    dateOfBirth: String
+    companyName: String
+    vatId: String
+    addresses: [Address]!
+    defaultShippingAddressId: String
+    shippingAddressIds: [String]!
+    defaultBillingAddressId: String
+    billingAddressIds: [String]!
     defaultShippingAddress: Address
     defaultBillingAddress: Address
-    addresses: [Address]!
     shippingAddresses: [Address]!
     billingAddresses: [Address]!
+    isEmailVerified: Boolean
+    externalId: String
   }
 
   type Query {
