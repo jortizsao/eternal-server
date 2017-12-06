@@ -7,14 +7,14 @@ describe('Commons', () => {
     const clientId = 'client1';
     const clientSecret = 'secret1';
     const projectKey = 'projectKey1';
-    const host = 'api.commercetools.co';
-    const oauthHost = 'auth.commercetools.co';
+    const host = 'https://api.commercetools.co';
+    const oauthHost = 'https://auth.commercetools.co';
     const entity = 'carts';
     const commercetools = Commercetools({ clientId, clientSecret, projectKey, host, oauthHost });
     const commonsService = CommonsService({ commercetools, entity });
 
     beforeEach(() => {
-      nock(`https://${oauthHost}`)
+      nock(oauthHost)
         .post('/oauth/token')
         .reply(200, {
           access_token: 'token1',
@@ -29,7 +29,7 @@ describe('Commons', () => {
         lineItems: [],
       };
 
-      nock(`https://${host}`)
+      nock(host)
         .get(`/${projectKey}/${entity}/${id}`)
         .reply(200, cart);
 
@@ -47,7 +47,7 @@ describe('Commons', () => {
         lineItems: [],
       };
 
-      nock(`https://${host}`)
+      nock(host)
         .post(`/${projectKey}/${entity}`, cart)
         .reply(200, {
           id: 'id1',
@@ -66,8 +66,8 @@ describe('Commons', () => {
         .then(done, done.fail);
     });
 
-    describe('should update an entity', () => {
-      it('considering the instance version', done => {
+    describe('when updating an entity', () => {
+      it('should consider the instance version', done => {
         const version = 1;
         const cart = {
           id: 'id1',
@@ -82,7 +82,7 @@ describe('Commons', () => {
           },
         ];
 
-        nock(`https://${host}`)
+        nock(host)
           .post(`/${projectKey}/${entity}/${cart.id}`, {
             version,
             actions,
@@ -106,7 +106,7 @@ describe('Commons', () => {
           .then(done, done.fail);
       });
 
-      it('without considering the instance version', done => {
+      it('should NOT consider the instance version', done => {
         const cart = {
           id: 'id1',
           customerEmail: 'javier.ortizsaorin@gmail.com',
@@ -127,7 +127,7 @@ describe('Commons', () => {
           }),
         );
 
-        nock(`https://${host}`)
+        nock(host)
           .post(`/${projectKey}/${entity}/${cart.id}`, {
             version: 3,
             actions,
@@ -152,7 +152,7 @@ describe('Commons', () => {
       });
     });
 
-    describe('should find instances', () => {
+    describe('when finding instances', () => {
       const cart = {
         id: 'id1',
         customerEmail: 'javier.ortizsaorin@gmail.com',
@@ -160,19 +160,19 @@ describe('Commons', () => {
         version: 1,
       };
 
-      it('by filters', done => {
-        const filter = 'customerEmail = "javier.ortizsaorin@gmail.com"';
+      it('should find by where', done => {
+        const where = 'customerEmail = "javier.ortizsaorin@gmail.com"';
 
-        nock(`https://${host}`)
+        nock(host)
           .get(`/${projectKey}/${entity}`)
-          .query({ where: filter })
+          .query({ where })
           .reply(200, {
             results: [cart],
             total: 1,
           });
 
         commonsService
-          .find({ filter })
+          .find({ where })
           .then(response => {
             expect(response).toEqual({
               results: [
@@ -190,7 +190,7 @@ describe('Commons', () => {
       });
 
       it('sorting the results', done => {
-        nock(`https://${host}`)
+        nock(host)
           .get(`/${projectKey}/${entity}?sort=customerEmail%20asc`)
           .reply(200, {
             results: [cart],
@@ -219,7 +219,7 @@ describe('Commons', () => {
         const page = 3;
         const perPage = 10;
 
-        nock(`https://${host}`)
+        nock(host)
           .get(`/${projectKey}/${entity}`)
           .query({ offset: (page - 1) * perPage, limit: perPage })
           .reply(200, {

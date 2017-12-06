@@ -62,7 +62,7 @@ function getServer() {
   initApolloEngine({ app, apiKey: config.get('APOLLO:ENGINE:KEY') });
   initMiddleware({ app });
   initModulesServerRoutes({ app, container });
-  initErrorRoutes({ app });
+  initErrorRoutes({ app, logger });
 
   app.init = () => {
     const port = config.get('PORT');

@@ -2,9 +2,9 @@
   "TITLE": "Eternal",
   "PORT": 3000,
   "COMMERCE_TOOLS": {
-    "API_HOST": "api.commercetools.co",
-    "OAUTH_URL": "auth.commercetools.co",
-    "ADMIN_URL": "admin.commercetools.co"
-  },
-  "CONCURRENCY": 10
+    "API_HOST": "https://api.commercetools.co",
+    "OAUTH_URL": "https://auth.commercetools.co",
+    "ADMIN_URL": "https://admin.commercetools.co",
+    "CONCURRENCY": 10
+  }
 }

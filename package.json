@@ -44,7 +44,7 @@
     "build": "npm-run-all lint clean babel copy_config"
   },
   "author": "javier.ortizsaorin@gmail.com",
-  "license": "MIT",
+  "license": "AGPL",
   "devDependencies": {
     "babel-cli": "^6.24.0",
     "babel-eslint": "^7.2.3",
@@ -72,6 +72,12 @@
     "rimraf": "^2.6.1"
   },
   "dependencies": {
+    "@commercetools/api-request-builder": "^3.4.0",
+    "@commercetools/sdk-client": "^1.5.2",
+    "@commercetools/sdk-middleware-auth": "^3.4.3",
+    "@commercetools/sdk-middleware-http": "^2.2.2",
+    "@commercetools/sdk-middleware-queue": "^1.1.2",
+    "@commercetools/sync-actions": "^1.12.2",
     "apollo-engine": "^0.6.0",
     "apollo-server-express": "^1.2.0",
     "awilix": "^2.9.0",
@@ -92,8 +98,6 @@
     "passport-local": "^1.0.0",
     "request": "^2.83.0",
     "request-promise": "^4.2.2",
-    "sphere-node-sdk": "^1.19.1",
-    "underscore": "^1.8.3",
     "winston": "^2.3.1"
   }
 }

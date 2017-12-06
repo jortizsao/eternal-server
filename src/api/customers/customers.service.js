@@ -4,7 +4,8 @@ export default function ({
   customObjectsService,
   commonsService,
 }) {
-  const restCTClient = commercetools.restCTClient;
+  const ctClient = commercetools.client;
+  const ctRequestBuilder = commercetools.requestBuilder;
 
   return {
     setCustomerNumber({ sequence, value, version }) {
@@ -20,7 +21,7 @@ export default function ({
 
     getCustomerNumber(sequence) {
       return customObjectsService
-        .find({ filter: `key="${sequence}"` })
+        .find({ where: `key="${sequence}"` })
         .then(({ results }) => (results.length > 0 ? results[0] : { value: 0 }))
         .then(lastValue => {
           return this.setCustomerNumber({
@@ -38,17 +39,19 @@ export default function ({
     },
 
     signIn(email, password, anonymousCartId) {
-      return new Promise((resolve, reject) => {
-        restCTClient.POST('/login', { email, password, anonymousCartId }, (err, res) => {
-          if (err) {
-            return reject(err);
-          } else if (res.statusCode === 400) {
-            return resolve();
-          } else {
-            return resolve(res.body.customer);
+      return ctClient
+        .execute({
+          uri: `${ctRequestBuilder.project.build()}login`,
+          method: 'POST',
+          body: { email, password, anonymousCartId },
+        })
+        .then(res => res.body.customer)
+        .catch(err => {
+          if (err.statusCode === 400) {
+            return;
           }
+          throw new Error(err);
         });
-      });
     },
 
     ...commonsService,
