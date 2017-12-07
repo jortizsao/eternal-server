@@ -25,8 +25,25 @@ const Customer = `
     externalId: String
   }
 
+  input CustomerDraft {
+    email: String
+    firstName: String
+    lastName: String
+    middleName: String
+    title: String
+    dateOfBirth: String
+    companyName: String
+    vatId: String
+    externalId: String
+    version: Int
+  }
+
   type Query {
     customer(id: ID!): Customer
+  }
+
+  type Mutation {
+    updateCustomer(id: ID!, customerDraft: CustomerDraft!): Customer
   }
 `;
 

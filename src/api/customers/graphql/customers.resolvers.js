@@ -26,4 +26,9 @@ export default {
       return getAddresses(addresses, billingAddressIds);
     },
   },
+  Mutation: {
+    updateCustomer(root, { id, customerDraft }, { customersService }) {
+      return customersService.updateCustomer({ id, customerDraft });
+    },
+  },
 };
