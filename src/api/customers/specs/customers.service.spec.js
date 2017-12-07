@@ -18,11 +18,15 @@ describe('Customers', () => {
     const customObjectsService = CustomObjectsService({
       commonsService: customObjectsCommonsService,
     });
+    const syncCustomers = {
+      buildActions() {},
+    };
     const customersService = CustomersService({
       commercetools,
       customersSequence,
       customObjectsService,
       commonsService: customersCommonsService,
+      syncCustomers,
     });
 
     beforeEach(() => {
@@ -204,6 +208,61 @@ describe('Customers', () => {
                 version: undefined,
               });
               expect(customerNumber).toBe(newCustomerNumber);
+            })
+            .then(done, done.fail);
+        });
+      });
+    });
+
+    describe('when updating a customer', () => {
+      let customerDraft;
+      let actions;
+      let id;
+
+      beforeEach(() => {
+        id = 'id1';
+        customerDraft = {
+          email: 'javier.ortizsaorin@gmail.com',
+          firstName: 'javier',
+          lastName: 'ortiz',
+        };
+        actions = [
+          {
+            name: 'action1',
+            value: 'value1',
+          },
+        ];
+        spyOn(syncCustomers, 'buildActions').and.returnValue(actions);
+      });
+
+      describe('when the customer exists', () => {
+        let version;
+
+        beforeEach(() => {
+          version = 1;
+          spyOn(customersService, 'byId').and.returnValue(
+            Promise.resolve({
+              id: 'id1',
+              email: 'javier.ortizsaorin@gmail.com',
+              firstName: 'new_name',
+              version,
+            }),
+          );
+          spyOn(customersService, 'update');
+        });
+
+        it('should update the customer', done => {
+          customersService
+            .updateCustomer({
+              id,
+              customerDraft,
+            })
+            .then(() => {
+              expect(customersService.update).toHaveBeenCalledWith({
+                id,
+                actions,
+                version,
+              });
             })
             .then(done, done.fail);
         });

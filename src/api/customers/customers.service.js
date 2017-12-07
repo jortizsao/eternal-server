@@ -3,6 +3,7 @@ export default function ({
   customersSequence,
   customObjectsService,
   commonsService,
+  syncCustomers,
 }) {
   const ctClient = commercetools.client;
   const ctRequestBuilder = commercetools.requestBuilder;
@@ -52,6 +53,22 @@ export default function ({
           }
           throw new Error(err);
         });
+    },
+
+    updateCustomer({ id, customerDraft }) {
+      return this.byId(id).then(oldCustomer => {
+        const newCustomer = {
+          ...oldCustomer,
+          ...customerDraft,
+        };
+        const actions = syncCustomers.buildActions(newCustomer, oldCustomer);
+
+        return this.update({
+          id: oldCustomer.id,
+          actions,
+          version: oldCustomer.version,
+        });
+      });
     },
 
     ...commonsService,

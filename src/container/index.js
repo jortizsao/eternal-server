@@ -1,3 +1,4 @@
+import { createSyncCustomers } from '@commercetools/sync-actions';
 import { createContainer, asFunction, Lifetime } from 'awilix';
 import Utils from '../utils';
 import Config from '../config';
@@ -34,6 +35,7 @@ export default function () {
       commercetools: _container.resolve('commercetools'),
       commonsService: getCommonsService(_container, 'customers'),
       authorizeService: _container.resolve('commercetools'),
+      syncCustomers: createSyncCustomers(),
     };
   }
 
