@@ -36,6 +36,7 @@ export default function () {
       commonsService: getCommonsService(_container, 'customers'),
       authorizeService: _container.resolve('commercetools'),
       syncCustomers: createSyncCustomers(),
+      utils: _container.resolve('utils'),
     };
   }
 

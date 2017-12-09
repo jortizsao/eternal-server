@@ -4,6 +4,7 @@ export default function ({
   customObjectsService,
   commonsService,
   syncCustomers,
+  utils,
 }) {
   const ctClient = commercetools.client;
   const ctRequestBuilder = commercetools.requestBuilder;
@@ -36,6 +37,7 @@ export default function ({
     signUp(customer) {
       return this.getCustomerNumber(customersSequence)
         .then(customerNumber => ({ ...customer, customerNumber: customerNumber.toString() }))
+        .then(utils.commons.fieldsToLowerCase)
         .then(this.save);
     },
 
@@ -59,7 +61,7 @@ export default function ({
       return this.byId(id).then(oldCustomer => {
         const newCustomer = {
           ...oldCustomer,
-          ...customerDraft,
+          ...utils.commons.fieldsToLowerCase(customerDraft),
         };
         const actions = syncCustomers.buildActions(newCustomer, oldCustomer);
 
