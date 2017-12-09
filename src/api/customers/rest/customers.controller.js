@@ -12,7 +12,10 @@ export default ({ customersUtils, customersService, authorizeService }) => {
     signUp(req, res, next) {
       try {
         const validCustomer = customersUtils.getValidCustomerToRegister(
-          pick(['firstName', 'lastName', 'email', 'password', 'confirmPassword'], req.body),
+          pick(
+            ['title', 'firstName', 'lastName', 'email', 'password', 'confirmPassword'],
+            req.body,
+          ),
         );
 
         return customersService

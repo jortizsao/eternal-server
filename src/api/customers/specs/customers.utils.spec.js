@@ -97,6 +97,7 @@ describe('Customers', () => {
 
     it('should get the customer fields cleaned', () => {
       const customer = {
+        title: '  mr  ',
         firstName: '  javier  ',
         lastName: 'ortiz   ',
         email: ' javier.ortizsaorin@gmail.com   ',
@@ -105,6 +106,7 @@ describe('Customers', () => {
       };
 
       const cleanedCustomer = {
+        title: 'mr',
         firstName: 'javier',
         lastName: 'ortiz',
         email: 'javier.ortizsaorin@gmail.com',
@@ -119,6 +121,7 @@ describe('Customers', () => {
 
     it('should check if customer is valid to register', () => {
       const validCustomer = {
+        title: '   mr   ',
         firstName: '   javier   ',
         lastName: '   ortiz       ',
         email: 'javier.ortizsaorin@gmail.com',
@@ -127,6 +130,7 @@ describe('Customers', () => {
       };
 
       const expectedValidCustomer = {
+        title: 'mr',
         firstName: 'javier',
         lastName: 'ortiz',
         email: 'javier.ortizsaorin@gmail.com',

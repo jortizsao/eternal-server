@@ -86,6 +86,7 @@ describe('Customers', () => {
 
     it('should sign up a NOT existing customer', done => {
       const customer = {
+        title: 'mr',
         firstName: 'javier',
         lastName: 'ortiz',
         email: 'javier.ortizsaorin@gmail.com',
@@ -101,6 +102,7 @@ describe('Customers', () => {
         Promise.resolve({
           customer: {
             id: 'id1',
+            title: 'mr',
             firstName: 'javier',
             lastName: 'ortiz',
             email: 'javier.ortizsaorin@gmail.com',
@@ -130,6 +132,7 @@ describe('Customers', () => {
           expect(res.json).toHaveBeenCalledWith({
             customer: {
               id: 'id1',
+              title: 'mr',
               firstName: 'javier',
               lastName: 'ortiz',
               email: 'javier.ortizsaorin@gmail.com',
