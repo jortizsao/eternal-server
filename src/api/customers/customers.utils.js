@@ -21,6 +21,7 @@ export default ({ utils }) => {
 
     getCleanedCustomer(customer) {
       return {
+        title: customer.title && customer.title.trim(),
         firstName: customer.firstName && customer.firstName.trim(),
         lastName: customer.lastName && customer.lastName.trim(),
         email: customer.email && customer.email.trim(),
