@@ -3,6 +3,7 @@ import Commercetools from '../../../commercetools';
 import CustomersService from '../customers.service';
 import CustomObjectsService from '../../custom-objects/custom-objects.service';
 import CommonsService from '../../commons/commons.service';
+import Utils from '../../../utils';
 
 describe('Customers', () => {
   describe('Service', () => {
@@ -21,12 +22,14 @@ describe('Customers', () => {
     const syncCustomers = {
       buildActions() {},
     };
+    const utils = Utils();
     const customersService = CustomersService({
       commercetools,
       customersSequence,
       customObjectsService,
       commonsService: customersCommonsService,
       syncCustomers,
+      utils,
     });
 
     beforeEach(() => {
