@@ -8,8 +8,8 @@ function getAddresses(addresses, addressesId) {
 
 export default {
   Query: {
-    customer(root, { id }, { customersService }) {
-      return customersService.byId(id);
+    customer(root, { id }, { customersService, authUser }) {
+      return customersService.byId({ id, authUser });
     },
   },
   Customer: {
@@ -27,8 +27,8 @@ export default {
     },
   },
   Mutation: {
-    updateCustomer(root, { id, customerDraft }, { customersService }) {
-      return customersService.updateCustomer({ id, customerDraft });
+    updateCustomer(root, { id, customerDraft }, { customersService, authUser }) {
+      return customersService.update({ id, customerDraft, authUser });
     },
   },
 };
