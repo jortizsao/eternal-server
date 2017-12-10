@@ -19,7 +19,10 @@ export default ({ customersUtils, customersService, authorizeService }) => {
         );
 
         return customersService
-          .find({ where: `lowercaseEmail="${validCustomer.email.toLowerCase()}"` })
+          .find({
+            where: `lowercaseEmail="${validCustomer.email.toLowerCase()}"`,
+            authUser: { isAdmin: true },
+          })
           .then(pipe(get('results'), first))
           .then(existingCustomer => {
             if (existingCustomer) {

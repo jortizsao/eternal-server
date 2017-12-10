@@ -251,21 +251,80 @@ describe('Customers', () => {
               version,
             }),
           );
-          spyOn(customersService, 'update');
+          spyOn(customersCommonsService, 'update');
         });
 
         it('should update the customer', done => {
           customersService
-            .updateCustomer({
+            .update({
               id,
               customerDraft,
+              authUser: { id },
             })
             .then(() => {
-              expect(customersService.update).toHaveBeenCalledWith({
+              expect(customersCommonsService.update).toHaveBeenCalledWith({
                 id,
                 actions,
                 version,
               });
+            })
+            .then(done, done.fail);
+        });
+      });
+    });
+
+    describe('when getting a customer by id', () => {
+      let customer;
+
+      beforeEach(() => {
+        customer = {
+          id: 'id1',
+          firstName: 'javier',
+          lastName: 'ortiz',
+          email: 'javier.ortizsaorin@gmail.com',
+        };
+        spyOn(customersCommonsService, 'byId').and.returnValue(Promise.resolve(customer));
+      });
+
+      describe('when the user is authenticated', () => {
+        describe('when the user has the right permission', () => {
+          it('should get the customer', done => {
+            customersService
+              .byId({ id: 'id1', authUser: { id: 'id1' } })
+              .then(customerResolved => {
+                expect(customersCommonsService.byId).toHaveBeenCalledWith('id1');
+                expect(customerResolved).toEqual(customer);
+              })
+              .then(done, done.fail);
+          });
+        });
+
+        describe('when the user does not have the right permission', () => {
+          it('should throw a "not authorized" error', done => {
+            customersService
+              .byId({ id: 'id1', authUser: { id: 'id2' } })
+              .then(() => {
+                throw new Error('this promise should not have been resolved');
+              })
+              .catch(err => {
+                expect(customersCommonsService.byId).not.toHaveBeenCalled();
+                expect(err).toEqual(new Error('Not authorized'));
+              })
+              .then(done, done.fail);
+          });
+        });
+      });
+
+      describe('when the user is not authenticated', () => {
+        it('should throw a "not authorized" error', done => {
+          customersService
+            .byId({ id: 'id1', authUser: null })
+            .then(() => {
+              throw new Error('this promise should not have been resolved');
+            })
+            .catch(err => {
+              expect(customersCommonsService.byId).not.toHaveBeenCalled();
+              expect(err).toEqual(new Error('Not authorized'));
             })
             .then(done, done.fail);
         });

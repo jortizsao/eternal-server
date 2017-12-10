@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import bodyParser from 'body-parser';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
+import jwt from 'express-jwt';
 import graphqlSchema from '../graphql/schema';
 import CustomersRest from '../api/customers/rest';
 import Cms from '../api/cms';
@@ -12,6 +13,7 @@ export default ({ app, container }) => {
   const customersController = container.resolve('customersController');
   const cmsController = container.resolve('cmsController');
   const authenticateMiddleware = container.resolve('authenticateMiddleware');
+  const config = container.resolve('config');
 
   app.use('/api/customers', CustomersRest({ router, customersController, authenticateMiddleware }));
   app.use('/api/cms', Cms({ router, cmsController }));
@@ -19,14 +21,16 @@ export default ({ app, container }) => {
 
   app.use(
     '/graphql',
+    jwt({ secret: config.get('TOKEN:SECRET'), credentialsRequired: false }),
     bodyParser.json(),
-    graphqlExpress({
+    graphqlExpress(req => ({
       schema: graphqlSchema,
       context: {
         customersService,
+        authUser: req.user,
       },
       tracing: process.env.NODE_ENV === 'production',
-    }),
+    })),
   );
   app.get('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
 

@@ -31,9 +31,12 @@ describe('Customers Resolvers', () => {
 
       spyOn(customersService, 'byId').and.returnValue(Promise.resolve(customer));
 
-      customerQuery({}, { id: 'id1' }, { customersService })
+      customerQuery({}, { id: 'id1' }, { customersService, authUser: { id: 'id1' } })
         .then(customerResolved => {
-          expect(customersService.byId).toHaveBeenCalledWith('id1');
+          expect(customersService.byId).toHaveBeenCalledWith({
+            id: 'id1',
+            authUser: { id: 'id1' },
+          });
           expect(customerResolved).toEqual(customer);
         })
         .then(done, done.fail);
@@ -100,7 +103,7 @@ describe('Customers Resolvers', () => {
           firstName: 'javier',
           lastName: 'ortiz',
         };
-        spyOn(customersService, 'updateCustomer').and.returnValue(
+        spyOn(customersService, 'update').and.returnValue(
           Promise.resolve({
             id,
             ...customerDraft,

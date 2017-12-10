@@ -38,7 +38,7 @@ export default function ({
       return this.getCustomerNumber(customersSequence)
         .then(customerNumber => ({ ...customer, customerNumber: customerNumber.toString() }))
         .then(utils.commons.fieldsToLowerCase)
-        .then(this.save);
+        .then(commonsService.save);
     },
 
     signIn(email, password, anonymousCartId) {
@@ -57,15 +57,15 @@ export default function ({
         });
     },
 
-    updateCustomer({ id, customerDraft }) {
-      return this.byId(id).then(oldCustomer => {
+    update({ id, customerDraft, authUser }) {
+      return this.byId({ id, authUser }).then(oldCustomer => {
         const newCustomer = {
           ...oldCustomer,
           ...utils.commons.fieldsToLowerCase(customerDraft),
         };
         const actions = syncCustomers.buildActions(newCustomer, oldCustomer);
 
-        return this.update({
+        return commonsService.update({
           id: oldCustomer.id,
           actions,
           version: oldCustomer.version,
@@ -73,6 +73,31 @@ export default function ({
       });
     },
 
-    ...commonsService,
+    byId({ id, authUser }) {
+      if (authUser && authUser.id === id) {
+        return commonsService.byId(id);
+      } else {
+        return Promise.reject(new Error('Not authorized'));
+      }
+    },
+
+    find({ where, page, perPage, sortBy, sortAscending, expand, authUser }) {
+      if (authUser) {
+        if (authUser.isAdmin) {
+          return commonsService.find({ where, page, perPage, sortBy, sortAscending, expand });
+        } else {
+          return commonsService.find({
+            where: `${where} and id="${authUser.id}"`,
+            page,
+            perPage,
+            sortBy,
+            sortAscending,
+            expand,
+          });
+        }
+      } else {
+        return Promise.reject(new Error('Not authorized'));
+      }
+    },
   };
 }
