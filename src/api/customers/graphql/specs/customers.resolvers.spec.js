@@ -91,6 +91,12 @@ describe('Customers Resolvers', () => {
   });
 
   describe('when mutating', () => {
+    let authUser;
+
+    beforeEach(() => {
+      authUser = { id: 'id1' };
+    });
+
     describe('when updating the customer', () => {
       const updateCustomerMutation = customersResolvers.Mutation.updateCustomer;
       let customerDraft;
@@ -112,11 +118,64 @@ describe('Customers Resolvers', () => {
       });
 
       it('should update the customer', done => {
-        updateCustomerMutation({}, { id, customerDraft }, { customersService })
+        updateCustomerMutation({}, { id, customerDraft }, { customersService, authUser })
           .then(customer => {
+            expect(customersService.update).toHaveBeenCalledWith({
+              id,
+              customerDraft,
+              authUser,
+            });
             expect(customer).toEqual({
               id,
               ...customerDraft,
+            });
+          })
+          .then(done, done.fail);
+      });
+    });
+
+    describe('when changing the password', () => {
+      const changeCustomerPasswordMutation = customersResolvers.Mutation.changeCustomerPassword;
+
+      let id;
+      let currentPassword;
+      let newPassword;
+
+      beforeEach(() => {
+        id = 'id1';
+        currentPassword = 'currentPassword';
+        newPassword = 'newPassword';
+
+        spyOn(customersService, 'changePassword').and.returnValue(
+          Promise.resolve({
+            id,
+            customerNumber: '1',
+            email: 'javier.ortizsaorin@gmail.com',
+            firstName: 'Javier',
+            lastName: 'Ortiz',
+          }),
+        );
+      });
+
+      it('should call the service in order to change the password', done => {
+        changeCustomerPasswordMutation(
+          {},
+          { id, currentPassword, newPassword },
+          { customersService, authUser },
+        )
+          .then(customer => {
+            expect(customersService.changePassword).toHaveBeenCalledWith(
+              id,
+              currentPassword,
+              newPassword,
+              { authUser },
+            );
+            expect(customer).toEqual({
+              id,
+              customerNumber: '1',
+              email: 'javier.ortizsaorin@gmail.com',
+              firstName: 'Javier',
+              lastName: 'Ortiz',
             });
           })
           .then(done, done.fail);

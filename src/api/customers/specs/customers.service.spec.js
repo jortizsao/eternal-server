@@ -4,6 +4,7 @@ import CustomersService from '../customers.service';
 import CustomObjectsService from '../../custom-objects/custom-objects.service';
 import CommonsService from '../../commons/commons.service';
 import Utils from '../../../utils';
+import { ValidationError, NotAuthorizedError, NotAuthenticatedError } from '../../../errors';
 
 describe('Customers', () => {
   describe('Service', () => {
@@ -308,7 +309,7 @@ describe('Customers', () => {
               })
               .catch(err => {
                 expect(customersCommonsService.byId).not.toHaveBeenCalled();
-                expect(err).toEqual(new Error('Not authorized'));
+                expect(err instanceof NotAuthorizedError).toBe(true);
               })
               .then(done, done.fail);
           });
@@ -316,7 +317,7 @@ describe('Customers', () => {
       });
 
       describe('when the user is not authenticated', () => {
-        it('should throw a "not authorized" error', done => {
+        it('should throw a "not authenticated" error', done => {
           customersService
             .byId({ id: 'id1', authUser: null })
             .then(() => {
@@ -324,9 +325,176 @@ describe('Customers', () => {
             })
             .catch(err => {
               expect(customersCommonsService.byId).not.toHaveBeenCalled();
-              expect(err).toEqual(new Error('Not authorized'));
+              expect(err instanceof NotAuthenticatedError).toBe(true);
             })
             .then(done, done.fail);
+        });
+      });
+    });
+
+    describe("when changing the customer's password", () => {
+      let id;
+      let version;
+      let currentPassword;
+      let newPassword;
+      let customerNumber;
+
+      beforeEach(() => {
+        id = 'id1';
+        version = 1;
+        currentPassword = 'currentPassword';
+        newPassword = 'newPassword';
+        customerNumber = 'cust1';
+      });
+
+      describe('when no errors', () => {
+        beforeEach(() => {
+          nock(host)
+            .post(`/${projectKey}/customers/password`, {
+              id,
+              currentPassword,
+              newPassword,
+              version,
+            })
+            .times(2)
+            .reply(200, {
+              id,
+              version: version + 1,
+              customerNumber,
+              password: newPassword,
+            });
+        });
+
+        describe('when version is passed', () => {
+          it("should update the customer's password", done => {
+            customersService
+              .changePassword(id, currentPassword, newPassword, {
+                authUser: { id },
+                version,
+              })
+              .then(customer => {
+                expect(customer).toEqual({
+                  id,
+                  customerNumber,
+                  password: newPassword,
+                  version: version + 1,
+                });
+              })
+              .then(done, done.fail);
+          });
+        });
+
+        describe('when the version is not passed', () => {
+          beforeEach(() => {
+            spyOn(customersService, 'byId').and.returnValue(
+              Promise.resolve({
+                id,
+                version,
+                customerNumber,
+                password: currentPassword,
+              }),
+            );
+          });
+
+          it("should update the customer's password", done => {
+            customersService
+              .changePassword(id, currentPassword, newPassword, {
+                authUser: { id },
+              })
+              .then(customer => {
+                expect(customer).toEqual({
+                  id,
+                  customerNumber,
+                  password: newPassword,
+                  version: version + 1,
+                });
+              })
+              .then(done, done.fail);
+          });
+        });
+      });
+
+      describe('when errors', () => {
+        describe('when the required fields are not passed', () => {
+          describe('when the current password is not passed', () => {
+            beforeEach(() => {
+              currentPassword = undefined;
+            });
+
+            it('should throw a validation error', done => {
+              customersService
+                .changePassword(id, currentPassword, newPassword, {
+                  authUser: { id },
+                  version,
+                })
+                .then(() => {
+                  throw new Error('This promise should not have been resolved');
+                })
+                .catch(err => {
+                  expect(err instanceof ValidationError).toBe(true);
+                  expect(err.message).toBe('"current password" is required');
+                })
+                .then(done, done.fail);
+            });
+          });
+
+          describe('when the new password is not passed', () => {
+            beforeEach(() => {
+              newPassword = undefined;
+            });
+
+            it('should throw a validation error', done => {
+              customersService
+                .changePassword(id, currentPassword, newPassword, {
+                  authUser: { id },
+                  version,
+                })
+                .then(() => {
+                  throw new Error('This promise should not have been resolved');
+                })
+                .catch(err => {
+                  expect(err instanceof ValidationError).toBe(true);
+                  expect(err.message).toBe('"new password" is required');
+                })
+                .then(done, done.fail);
+            });
+          });
+        });
+
+        describe('when the user is not authenticated', () => {
+          it('should throw a "not authenticated" error', done => {
+            customersService
+              .changePassword(id, currentPassword, newPassword, {
+                authUser: null,
+                version,
+              })
+              .then(() => {
+                throw new Error('This promise should not have been resolved');
+              })
+              .catch(err => {
+                expect(err instanceof NotAuthenticatedError).toBe(true);
+                expect(err.message).toBe('not authenticated');
+              })
+              .then(done, done.fail);
+          });
+        });
+
+        describe('when the user does not have the right permissions', () => {
+          it('should throw a "not authorized" error', done => {
+            customersService
+              .changePassword(id, currentPassword, newPassword, {
+                authUser: { id: 'otherId' },
+                version,
+              })
+              .then(() => {
+                throw new Error('This promise should not have been resolved');
+              })
+              .catch(err => {
+                expect(err instanceof NotAuthorizedError).toBe(true);
+                expect(err.message).toBe('not authorized');
+              })
+              .then(done, done.fail);
+          });
         });
       });
     });

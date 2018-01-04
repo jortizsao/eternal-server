@@ -1,3 +1,5 @@
+import { NotAuthorizedError, NotAuthenticatedError } from '../errors';
+
 export default {
   isStringEmpty(value) {
     return !value || value.length === 0;
@@ -13,5 +15,17 @@ export default {
 
       return objectLowerCase;
     }, {});
+  },
+
+  checkIfUserAuthorized(customerId, authUser) {
+    if (!authUser.isAdmin && customerId !== authUser.id) {
+      throw new NotAuthorizedError();
+    }
+  },
+
+  checkIfUserAuthenticated(authUser) {
+    if (!authUser) {
+      throw new NotAuthenticatedError();
+    }
   },
 };

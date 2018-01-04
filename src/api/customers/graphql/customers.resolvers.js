@@ -30,5 +30,12 @@ export default {
     updateCustomer(root, { id, customerDraft }, { customersService, authUser }) {
       return customersService.update({ id, customerDraft, authUser });
     },
+    changeCustomerPassword(
+      root,
+      { id, currentPassword, newPassword },
+      { customersService, authUser },
+    ) {
+      return customersService.changePassword(id, currentPassword, newPassword, { authUser });
+    },
   },
 };
