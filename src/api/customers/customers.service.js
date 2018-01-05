@@ -1,3 +1,5 @@
+import { ValidationError } from '../../errors';
+
 export default function ({
   commercetools,
   customersSequence,
@@ -8,6 +10,16 @@ export default function ({
 }) {
   const ctClient = commercetools.client;
   const ctRequestBuilder = commercetools.requestBuilder;
+
+  function checkChangePasswordRequiredFields(currentPassword, newPassword) {
+    if (utils.commons.isStringEmpty(currentPassword)) {
+      throw new ValidationError('"current password" is required');
+    }
+
+    if (utils.commons.isStringEmpty(newPassword)) {
+      throw new ValidationError('"new password" is required');
+    }
+  }
 
   return {
     setCustomerNumber({ sequence, value, version }) {
@@ -74,11 +86,12 @@ export default function ({
     },
 
     byId({ id, authUser }) {
-      if (authUser && authUser.id === id) {
-        return commonsService.byId(id);
-      } else {
-        return Promise.reject(new Error('Not authorized'));
-      }
+      return Promise.resolve()
+        .then(() => {
+          utils.commons.checkIfUserAuthenticated(authUser);
+          utils.commons.checkIfUserAuthorized(id, authUser);
+        })
+        .then(() => commonsService.byId(id));
     },
 
     find({ where, page, perPage, sortBy, sortAscending, expand, authUser }) {
@@ -98,6 +111,30 @@ export default function ({
       } else {
         return Promise.reject(new Error('Not authorized'));
       }
+    },
+
+    changePassword(id, currentPassword, newPassword, { authUser, version }) {
+      return Promise.resolve()
+        .then(() => {
+          checkChangePasswordRequiredFields(currentPassword, newPassword);
+          utils.commons.checkIfUserAuthenticated(authUser);
+          utils.commons.checkIfUserAuthorized(id, authUser);
+        })
+        .then(() => {
+          if (version) {
+            return version;
+          }
+
+          return this.byId({ id, authUser }).then(customer => customer.version);
+        })
+        .then(customerVersion => {
+          return ctClient.execute({
+            uri: `${ctRequestBuilder.customers.build()}/password`,
+            method: 'POST',
+            body: { id, version: customerVersion, currentPassword, newPassword },
+          });
+        })
+        .then(res => res.body);
     },
   };
 }
