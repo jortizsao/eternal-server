@@ -35,6 +35,7 @@ describe('Customers', () => {
 
     beforeEach(() => {
       nock(oauthHost)
+        .persist()
         .post('/oauth/token')
         .reply(200, {
           access_token: 'token1',
@@ -499,7 +500,7 @@ describe('Customers', () => {
       });
     });
 
-    describe('when adding an address', () => {
+    fdescribe('when adding an address', () => {
       const customerId = 'id1';
 
       const address = {
@@ -528,14 +529,24 @@ describe('Customers', () => {
             addresses: [address],
           });
 
-        spyOn(customersService, 'byId').and.returnValue(
-          Promise.resolve({
+        nock(host)
+          .persist()
+          .get(`/${projectKey}/customers/${customerId}`)
+          .reply(200, {
             id: 'id1',
             email: 'javier.ortizsaorin@gmail.com',
             password: '12345',
             version: 1,
-          }),
-        );
+          });
+
+        // spyOn(customersService, 'byId').and.returnValue(
+        //   Promise.resolve({
+        //     id: 'id1',
+        //     email: 'javier.ortizsaorin@gmail.com',
+        //     password: '12345',
+        //     version: 1,
+        //   }),
+        // );
       });
 
       it('should validate the required fields', done => {
@@ -571,7 +582,7 @@ describe('Customers', () => {
           .then(done, done.fail);
       });
 
-      describe('when the customer version is passed', () => {
+      xdescribe('when the customer version is passed', () => {
         it('should add the address to the customer', done => {
           customersService
             .addAddress(customerId, address, { authUser, version })
@@ -587,7 +598,7 @@ describe('Customers', () => {
         });
       });
 
-      describe('when the version is not passed', () => {
+      xdescribe('when the version is not passed', () => {
         it('should add the address to the customer', done => {
           customersService
             .addAddress(customerId, address, { authUser })
@@ -603,5 +614,15 @@ describe('Customers', () => {
         });
       });
     });
+
+    // describe('when setting the default billing address', () => {
+    //   it('should validate if the user is authenticated', (done) => {
+    //
+    //   });
+    //
+    //   it('should validate if the user is authorized', (done) => {
+    //
+    //   });
+    // });
   });
 });
