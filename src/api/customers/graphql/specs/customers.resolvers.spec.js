@@ -181,5 +181,51 @@ describe('Customers Resolvers', () => {
           .then(done, done.fail);
       });
     });
+
+    describe('when adding an address to the customer', () => {
+      const addCustomerAddressMutation = customersResolvers.Mutation.addCustomerAddress;
+
+      let id;
+      let addressDraft;
+
+      beforeEach(() => {
+        id = 'id1';
+        addressDraft = {
+          firstName: 'javier',
+          lastName: 'ortiz saorin',
+          streetName: 'plaza de la reina',
+          city: 'valencia',
+          postalCode: '46003',
+          country: 'spain',
+        };
+
+        spyOn(customersService, 'addAddress').and.returnValue(
+          Promise.resolve({
+            id,
+            customerNumber: '1',
+            email: 'javier.ortizsaorin@gmail.com',
+            firstName: 'Javier',
+            lastName: 'Ortiz',
+          }),
+        );
+      });
+
+      it('should call the service in order to add the address', done => {
+        addCustomerAddressMutation({}, { id, addressDraft }, { customersService, authUser })
+          .then(customer => {
+            expect(customersService.addAddress).toHaveBeenCalledWith(id, addressDraft, {
+              authUser,
+            });
+            expect(customer).toEqual({
+              id,
+              customerNumber: '1',
+              email: 'javier.ortizsaorin@gmail.com',
+              firstName: 'Javier',
+              lastName: 'Ortiz',
+            });
+          })
+          .then(done, done.fail);
+      });
+    });
   });
 });

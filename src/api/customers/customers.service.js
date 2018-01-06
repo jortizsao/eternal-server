@@ -46,6 +46,14 @@ export default function ({
         });
     },
 
+    getCustomerVersion(id, version, authUser) {
+      if (version) {
+        return version;
+      }
+
+      return this.byId({ id, authUser }).then(customer => customer.version);
+    },
+
     signUp(customer) {
       return this.getCustomerNumber(customersSequence)
         .then(customerNumber => ({ ...customer, customerNumber: customerNumber.toString() }))
@@ -120,18 +128,38 @@ export default function ({
           utils.commons.checkIfUserAuthenticated(authUser);
           utils.commons.checkIfUserAuthorized(id, authUser);
         })
-        .then(() => {
-          if (version) {
-            return version;
-          }
-
-          return this.byId({ id, authUser }).then(customer => customer.version);
-        })
+        .then(() => this.getCustomerVersion(id, version, authUser))
         .then(customerVersion => {
           return ctClient.execute({
             uri: `${ctRequestBuilder.customers.build()}/password`,
             method: 'POST',
             body: { id, version: customerVersion, currentPassword, newPassword },
+          });
+        })
+        .then(res => res.body);
+    },
+
+    addAddress(id, address, { authUser, version }) {
+      return Promise.resolve()
+        .then(() => {
+          utils.commons.checkIfAddressHasRequiredFields(address);
+          utils.commons.checkIfUserAuthenticated(authUser);
+          utils.commons.checkIfUserAuthorized(id, authUser);
+        })
+        .then(() => this.getCustomerVersion(id, version, authUser))
+        .then(customerVersion => {
+          return ctClient.execute({
+            uri: `${ctRequestBuilder.customers.build()}/${id}`,
+            method: 'POST',
+            body: {
+              version: customerVersion,
+              actions: [
+                {
+                  action: 'addAddress',
+                  address,
+                },
+              ],
+            },
           });
         })
         .then(res => res.body);
