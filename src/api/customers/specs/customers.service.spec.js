@@ -498,5 +498,110 @@ describe('Customers', () => {
         });
       });
     });
+
+    describe('when adding an address', () => {
+      const customerId = 'id1';
+
+      const address = {
+        firstName: 'javier',
+        lastName: 'ortiz saorin',
+        streetName: 'plaza de la reina',
+        city: 'valencia',
+        postalCode: '46003',
+        country: 'spain',
+      };
+
+      const authUser = {
+        id: 'id1',
+      };
+
+      const version = 1;
+
+      beforeEach(() => {
+        nock(host)
+          .persist()
+          .post(`/${projectKey}/customers/${customerId}`)
+          .reply(200, {
+            id: 'id1',
+            email: 'javier.ortizsaorin@gmail.com',
+            password: '12345',
+            addresses: [address],
+          });
+
+        spyOn(customersService, 'byId').and.returnValue(
+          Promise.resolve({
+            id: 'id1',
+            email: 'javier.ortizsaorin@gmail.com',
+            password: '12345',
+            version: 1,
+          }),
+        );
+      });
+
+      it('should validate the required fields', done => {
+        spyOn(utils.commons, 'checkIfAddressHasRequiredFields');
+
+        customersService
+          .addAddress(customerId, address, { authUser })
+          .then(() => {
+            expect(utils.commons.checkIfAddressHasRequiredFields).toHaveBeenCalledWith(address);
+          })
+          .then(done, done.fail);
+      });
+
+      it('should validate if the user is authenticated', done => {
+        spyOn(utils.commons, 'checkIfUserAuthenticated');
+
+        customersService
+          .addAddress(customerId, address, { authUser })
+          .then(() => {
+            expect(utils.commons.checkIfUserAuthenticated).toHaveBeenCalledWith(authUser);
+          })
+          .then(done, done.fail);
+      });
+
+      it('should validate if the user is authorized', done => {
+        spyOn(utils.commons, 'checkIfUserAuthorized');
+
+        customersService
+          .addAddress(customerId, address, { authUser })
+          .then(() => {
+            expect(utils.commons.checkIfUserAuthorized).toHaveBeenCalledWith(customerId, authUser);
+          })
+          .then(done, done.fail);
+      });
+
+      describe('when the customer version is passed', () => {
+        it('should add the address to the customer', done => {
+          customersService
+            .addAddress(customerId, address, { authUser, version })
+            .then(customer => {
+              expect(customer).toEqual({
+                id: 'id1',
+                email: 'javier.ortizsaorin@gmail.com',
+                password: '12345',
+                addresses: [address],
+              });
+            })
+            .then(done, done.fail);
+        });
+      });
+
+      describe('when the version is not passed', () => {
+        it('should add the address to the customer', done => {
+          customersService
+            .addAddress(customerId, address, { authUser })
+            .then(customer => {
+              expect(customer).toEqual({
+                id: 'id1',
+                email: 'javier.ortizsaorin@gmail.com',
+                password: '12345',
+                addresses: [address],
+              });
+            })
+            .then(done, done.fail);
+        });
+      });
+    });
   });
 });

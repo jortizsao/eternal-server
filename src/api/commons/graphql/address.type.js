@@ -1,6 +1,6 @@
 const address = `
   type Address {
-    id: ID!
+    id: ID
     title: String
     salutation: String
     firstName: String
@@ -23,6 +23,19 @@ const address = `
     fax: String
     additionalAddressInfo: String
     externalId: String
-  }`;
+  }
+
+  input AddressDraft {
+    title: String
+    firstName: String!
+    lastName: String!
+    streetName: String!
+    additionalStreetInfo: String
+    city: String!
+    region: String
+    postalCode: String!
+    country: String!
+  }
+`;
 
 export default address;

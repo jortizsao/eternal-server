@@ -1,4 +1,4 @@
-import { NotAuthorizedError, NotAuthenticatedError } from '../errors';
+import { NotAuthorizedError, NotAuthenticatedError, ValidationError } from '../errors';
 
 export default {
   isStringEmpty(value) {
@@ -27,5 +27,19 @@ export default {
     if (!authUser) {
       throw new NotAuthenticatedError();
     }
+  },
+
+  checkRequiredFields(object, requiredFields) {
+    requiredFields.forEach(field => {
+      if (this.isStringEmpty(object[field])) {
+        throw new ValidationError(`"${field}" is required`);
+      }
+    });
+  },
+
+  checkIfAddressHasRequiredFields(address) {
+    const requiredFields = ['firstName', 'lastName', 'streetName', 'city', 'postalCode', 'country'];
+
+    this.checkRequiredFields(address, requiredFields);
   },
 };
