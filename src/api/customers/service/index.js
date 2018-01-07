@@ -36,6 +36,6 @@ export default ({
     byId: secured(customersService.byId),
     update: secured(customersService.update),
     changePassword: secured(customersService.changePassword),
-    addAddress: secured(customersService.addAddress),
+    saveAddress: secured(customersService.saveAddress),
   };
 };

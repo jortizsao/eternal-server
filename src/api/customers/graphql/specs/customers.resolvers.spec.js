@@ -176,7 +176,7 @@ describe('Customers Resolvers', () => {
     });
 
     describe('when adding an address to the customer', () => {
-      const addCustomerAddressMutation = customersResolvers.Mutation.addCustomerAddress;
+      const saveCustomerAddressMutation = customersResolvers.Mutation.saveCustomerAddress;
 
       let id;
       let addressDraft;
@@ -192,7 +192,7 @@ describe('Customers Resolvers', () => {
           country: 'spain',
         };
 
-        spyOn(customersService, 'addAddress').and.returnValue(
+        spyOn(customersService, 'saveAddress').and.returnValue(
           Promise.resolve({
             id,
             customerNumber: '1',
@@ -204,9 +204,9 @@ describe('Customers Resolvers', () => {
       });
 
       it('should call the service in order to add the address', done => {
-        addCustomerAddressMutation({}, { id, addressDraft }, { customersService, authUser })
+        saveCustomerAddressMutation({}, { id, addressDraft }, { customersService, authUser })
           .then(customer => {
-            expect(customersService.addAddress).toHaveBeenCalledWith(id, addressDraft, {
+            expect(customersService.saveAddress).toHaveBeenCalledWith(id, addressDraft, {
               authUser,
             });
             expect(customer).toEqual({

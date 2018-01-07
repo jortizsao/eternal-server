@@ -1,3 +1,4 @@
+import { last, get, find, pipe } from 'lodash/fp';
 import { ValidationError } from '../../../errors';
 
 export default function ({
@@ -120,26 +121,81 @@ export default function ({
       )
       .then(res => res.body);
 
-  service.addAddress = (id, address, options = {}) =>
+  service.saveAddress = (id, addressDraft, options = {}) =>
     Promise.resolve()
-      .then(() => utils.commons.checkIfAddressHasRequiredFields(address))
+      .then(() => utils.commons.checkIfAddressHasRequiredFields(addressDraft))
       .then(() => service.getCustomerVersion(id, options.version))
-      .then(customerVersion =>
-        ctClient.execute({
-          uri: `${ctRequestBuilder.customers.build()}/${id}`,
-          method: 'POST',
-          body: {
-            version: customerVersion,
-            actions: [
-              {
-                action: 'addAddress',
-                address,
-              },
-            ],
-          },
+      .then(version =>
+        commonsService.update({
+          id,
+          version,
+          actions: [
+            {
+              action: addressDraft.id ? 'changeAddress' : 'addAddress',
+              address: addressDraft,
+              addressId: addressDraft.id,
+            },
+          ],
         }),
       )
-      .then(res => res.body);
+      .then(customer => {
+        const address = addressDraft.id
+          ? pipe(get('addresses'), find({ id: addressDraft.id }))(customer)
+          : pipe(get('addresses'), last)(customer);
+        const wasDefaultShipping = address.id === customer.defaultShippingAddressId;
+        const wasDefaultBilling = address.id === customer.defaultBillingAddressId;
+
+        if (
+          addressDraft.isDefaultBilling ||
+          addressDraft.isDefaultShipping ||
+          wasDefaultShipping ||
+          wasDefaultBilling
+        ) {
+          return service.setDefaultAddress(id, address.id, {
+            version: customer.version,
+            isDefaultShipping: addressDraft.isDefaultShipping,
+            isDefaultBilling: addressDraft.isDefaultBilling,
+            wasDefaultShipping,
+            wasDefaultBilling,
+          });
+        }
+
+        return customer;
+      });
+
+  service.setDefaultAddress = (id, addressId, options = {}) => {
+    const actions = [];
+
+    if (options.isDefaultShipping) {
+      actions.push({
+        action: 'setDefaultShippingAddress',
+        addressId,
+      });
+    } else if (options.wasDefaultShipping) {
+      actions.push({
+        action: 'setDefaultShippingAddress',
+      });
+    }
+
+    if (options.isDefaultBilling) {
+      actions.push({
+        action: 'setDefaultBillingAddress',
+        addressId,
+      });
+    } else if (options.wasDefaultBilling) {
+      actions.push({
+        action: 'setDefaultBillingAddress',
+      });
+    }
+
+    return service.getCustomerVersion(id, options.version).then(version =>
+      commonsService.update({
+        id,
+        version,
+        actions,
+      }),
+    );
+  };
 
   return service;
 }

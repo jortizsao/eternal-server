@@ -418,7 +418,7 @@ describe('Customers', () => {
         spyOn(utils.commons, 'checkIfAddressHasRequiredFields');
 
         customersService
-          .addAddress(customerId, address)
+          .saveAddress(customerId, address)
           .then(() => {
             expect(utils.commons.checkIfAddressHasRequiredFields).toHaveBeenCalledWith(address);
           })
@@ -428,7 +428,7 @@ describe('Customers', () => {
       describe('when the customer version is passed', () => {
         it('should add the address to the customer', done => {
           customersService
-            .addAddress(customerId, address, { version })
+            .saveAddress(customerId, address, { version })
             .then(customer => {
               expect(customer).toEqual({
                 id: 'id1',
@@ -444,7 +444,7 @@ describe('Customers', () => {
       describe('when the version is not passed', () => {
         it('should add the address to the customer', done => {
           customersService
-            .addAddress(customerId, address)
+            .saveAddress(customerId, address)
             .then(customer => {
               expect(customer).toEqual({
                 id: 'id1',
@@ -457,15 +457,5 @@ describe('Customers', () => {
         });
       });
     });
-
-    // describe('when setting the default billing address', () => {
-    //   it('should validate if the user is authenticated', (done) => {
-    //
-    //   });
-    //
-    //   it('should validate if the user is authorized', (done) => {
-    //
-    //   });
-    // });
   });
 });

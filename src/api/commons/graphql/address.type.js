@@ -1,6 +1,6 @@
 const address = `
   type Address {
-    id: ID
+    id: ID!
     title: String
     salutation: String
     firstName: String
@@ -26,6 +26,7 @@ const address = `
   }
 
   input AddressDraft {
+    id: ID
     title: String
     firstName: String!
     lastName: String!
@@ -35,6 +36,8 @@ const address = `
     region: String
     postalCode: String!
     country: String!
+    isDefaultShipping: Boolean
+    isDefaultBilling: Boolean
   }
 `;
 
