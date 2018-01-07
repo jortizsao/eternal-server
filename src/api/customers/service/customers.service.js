@@ -1,4 +1,4 @@
-import { last, get, pipe } from 'lodash/fp';
+import { last, get, find, pipe } from 'lodash/fp';
 import { ValidationError } from '../../../errors';
 
 export default function ({
@@ -121,9 +121,9 @@ export default function ({
       )
       .then(res => res.body);
 
-  service.saveAddress = (id, address, options = {}) =>
+  service.saveAddress = (id, addressDraft, options = {}) =>
     Promise.resolve()
-      .then(() => utils.commons.checkIfAddressHasRequiredFields(address))
+      .then(() => utils.commons.checkIfAddressHasRequiredFields(addressDraft))
       .then(() => service.getCustomerVersion(id, options.version))
       .then(version =>
         commonsService.update({
@@ -131,21 +131,40 @@ export default function ({
           version,
           actions: [
             {
-              action: address.id ? 'changeAddress' : 'addAddress',
-              address,
-              addressId: address.id,
+              action: addressDraft.id ? 'changeAddress' : 'addAddress',
+              address: addressDraft,
+              addressId: addressDraft.id,
             },
           ],
         }),
       )
       .then(customer => {
-        if (address.isDefaultBilling || address.isDefaultShipping) {
-          const addressId = address.id || pipe(get('addresses'), last, get('id'))(customer);
+        const address = addressDraft.id
+          ? pipe(get('addresses'), find({ id: addressDraft.id }))(customer)
+          : pipe(get('addresses'), last)(customer);
+        const wasDefaultShipping = address.id === customer.defaultShippingAddressId;
+        const wasDefaultBilling = address.id === customer.defaultBillingAddressId;
 
-          return service.setDefaultAddress(id, addressId, {
+        console.log(
+          'Dentro',
+          addressDraft.isDefaultShipping,
+          addressDraft.isDefaultBilling,
+          wasDefaultShipping,
+          wasDefaultBilling,
+        );
+
+        if (
+          addressDraft.isDefaultBilling ||
+          addressDraft.isDefaultShipping ||
+          wasDefaultShipping ||
+          wasDefaultBilling
+        ) {
+          return service.setDefaultAddress(id, address.id, {
             version: customer.version,
-            isDefaultShipping: address.isDefaultShipping,
-            isDefaultBilling: address.isDefaultBilling,
+            isDefaultShipping: addressDraft.isDefaultShipping,
+            isDefaultBilling: addressDraft.isDefaultBilling,
+            wasDefaultShipping,
+            wasDefaultBilling,
           });
         }
 
@@ -160,12 +179,20 @@ export default function ({
         action: 'setDefaultShippingAddress',
         addressId,
       });
+    } else if (options.wasDefaultShipping) {
+      actions.push({
+        action: 'setDefaultShippingAddress',
+      });
     }
 
     if (options.isDefaultBilling) {
       actions.push({
         action: 'setDefaultBillingAddress',
         addressId,
+      });
+    } else if (options.wasDefaultBilling) {
+      actions.push({
+        action: 'setDefaultBillingAddress',
       });
     }
 
