@@ -1,7 +1,7 @@
 import deepFreeze from 'deep-freeze';
-import { ValidationError } from '../../../errors';
+import { ValidationError } from '../../../../errors';
 import CustomersUtils from '../customers.utils';
-import Utils from '../../../utils';
+import Utils from '../../../../utils';
 
 describe('Customers', () => {
   describe('Utils', () => {

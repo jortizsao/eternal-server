@@ -1,5 +1,5 @@
 import { pick } from 'lodash/fp';
-import { ValidationError } from '../../errors';
+import { ValidationError } from '../../../errors';
 
 export default ({ utils }) => {
   return {

@@ -1,4 +1,4 @@
-import { ValidationError } from '../../errors';
+import { ValidationError } from '../../../errors';
 
 export default function ({
   commercetools,
@@ -20,17 +20,6 @@ export default function ({
     if (utils.commons.isStringEmpty(newPassword)) {
       throw new ValidationError('"new password" is required');
     }
-  };
-
-  const secured = cb => (id, ...args) => {
-    const { authUser } = args[args.length - 1];
-
-    return Promise.resolve()
-      .then(() => {
-        utils.commons.checkIfUserAuthenticated(authUser);
-        utils.commons.checkIfUserAuthorized(id, authUser);
-      })
-      .then(() => cb(id, ...args));
   };
 
   service.setCustomerNumber = ({ sequence, value, version }) =>
@@ -57,10 +46,8 @@ export default function ({
           .catch(() => service.getCustomerNumber(sequence)); // We request a new one on error
       });
 
-  service.getCustomerVersion = (id, version, authUser) =>
-    Promise.resolve().then(
-      () => version || service.byId({ id, authUser }).then(customer => customer.version),
-    );
+  service.getCustomerVersion = (id, version) =>
+    Promise.resolve().then(() => version || service.byId(id).then(customer => customer.version));
 
   service.signUp = customer =>
     service
@@ -84,8 +71,8 @@ export default function ({
         throw new Error(err);
       });
 
-  service.update = ({ id, customerDraft, authUser }) =>
-    service.byId({ id, authUser }).then(oldCustomer => {
+  service.update = (id, customerDraft, options = {}) =>
+    service.byId(id).then(oldCustomer => {
       const newCustomer = {
         ...oldCustomer,
         ...utils.commons.fieldsToLowerCase(customerDraft),
@@ -95,17 +82,11 @@ export default function ({
       return commonsService.update({
         id: oldCustomer.id,
         actions,
-        version: oldCustomer.version,
+        version: options.version || oldCustomer.version,
       });
     });
 
-  service.byId = ({ id, authUser }) =>
-    Promise.resolve()
-      .then(() => {
-        utils.commons.checkIfUserAuthenticated(authUser);
-        utils.commons.checkIfUserAuthorized(id, authUser);
-      })
-      .then(() => commonsService.byId(id));
+  service.byId = id => commonsService.byId(id);
 
   service.find = ({ where, page, perPage, sortBy, sortAscending, expand, authUser }) => {
     if (authUser) {
@@ -126,14 +107,10 @@ export default function ({
     }
   };
 
-  service.changePassword = (id, currentPassword, newPassword, { authUser, version }) =>
+  service.changePassword = (id, currentPassword, newPassword, options = {}) =>
     Promise.resolve()
-      .then(() => {
-        checkChangePasswordRequiredFields(currentPassword, newPassword);
-        utils.commons.checkIfUserAuthenticated(authUser);
-        utils.commons.checkIfUserAuthorized(id, authUser);
-      })
-      .then(() => service.getCustomerVersion(id, version, authUser))
+      .then(() => checkChangePasswordRequiredFields(currentPassword, newPassword))
+      .then(() => service.getCustomerVersion(id, options.version))
       .then(customerVersion =>
         ctClient.execute({
           uri: `${ctRequestBuilder.customers.build()}/password`,
@@ -143,14 +120,10 @@ export default function ({
       )
       .then(res => res.body);
 
-  service.addAddress = (id, address, { authUser, version }) =>
-    Promise.resolve(utils.commons.checkIfAddressHasRequiredFields(address))
-      // .then(() => {
-      //   utils.commons.checkIfAddressHasRequiredFields(address);
-      //   // utils.commons.checkIfUserAuthenticated(authUser);
-      //   // utils.commons.checkIfUserAuthorized(id, authUser);
-      // })
-      .then(() => service.getCustomerVersion(id, version, authUser))
+  service.addAddress = (id, address, options = {}) =>
+    Promise.resolve()
+      .then(() => utils.commons.checkIfAddressHasRequiredFields(address))
+      .then(() => service.getCustomerVersion(id, options.version))
       .then(customerVersion =>
         ctClient.execute({
           uri: `${ctRequestBuilder.customers.build()}/${id}`,
@@ -168,13 +141,5 @@ export default function ({
       )
       .then(res => res.body);
 
-  return {
-    ...service,
-    addAddress: secured(service.addAddress),
-  };
-
-  // return {
-  //   ...service,
-  //   addAddress: secured(service.addAddress),
-  // };
+  return service;
 }
