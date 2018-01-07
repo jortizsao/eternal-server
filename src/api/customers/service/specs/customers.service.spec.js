@@ -411,7 +411,15 @@ describe('Customers', () => {
             addresses: [address],
           });
 
-        spyOn(customersService, 'getCustomerVersion').and.returnValue(Promise.resolve(1));
+        nock(host)
+          .persist()
+          .get(`/${projectKey}/customers/${customerId}`)
+          .reply(200, {
+            id: 'id1',
+            email: 'javier.ortizsaorin@gmail.com',
+            password: '12345',
+            version: 1,
+          });
       });
 
       it('should validate the required fields', done => {

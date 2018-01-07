@@ -124,11 +124,10 @@ export default function ({
   service.saveAddress = (id, addressDraft, options = {}) =>
     Promise.resolve()
       .then(() => utils.commons.checkIfAddressHasRequiredFields(addressDraft))
-      .then(() => service.getCustomerVersion(id, options.version))
-      .then(version =>
+      .then(() =>
         commonsService.update({
           id,
-          version,
+          version: options.version,
           actions: [
             {
               action: addressDraft.id ? 'changeAddress' : 'addAddress',
@@ -188,14 +187,24 @@ export default function ({
       });
     }
 
-    return service.getCustomerVersion(id, options.version).then(version =>
-      commonsService.update({
-        id,
-        version,
-        actions,
-      }),
-    );
+    return commonsService.update({
+      id,
+      version: options.version,
+      actions,
+    });
   };
+
+  service.removeAddress = (id, addressId, options = {}) =>
+    commonsService.update({
+      id,
+      version: options.version,
+      actions: [
+        {
+          action: 'removeAddress',
+          addressId,
+        },
+      ],
+    });
 
   return service;
 }

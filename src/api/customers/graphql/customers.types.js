@@ -45,7 +45,8 @@ const Customer = `
   type Mutation {
     updateCustomer(id: ID!, customerDraft: CustomerDraft!): Customer
     changeCustomerPassword(id: ID!, currentPassword: String!, newPassword: String!) : Customer
-    saveCustomerAddress(id: ID!, addressDraft: AddressDraft) : Customer
+    saveCustomerAddress(id: ID!, addressDraft: AddressDraft!) : Customer
+    removeCustomerAddress(id: ID!, addressId: String!) : Customer
   }
 `;
 

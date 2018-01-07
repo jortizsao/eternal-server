@@ -45,5 +45,9 @@ export default {
     saveCustomerAddress(root, { id, addressDraft }, { customersService, authUser }) {
       return customersService.saveAddress(id, addressDraft, { authUser });
     },
+
+    removeCustomerAddress(root, { id, addressId }, { customersService, authUser }) {
+      return customersService.removeAddress(id, addressId, { authUser });
+    },
   },
 };
