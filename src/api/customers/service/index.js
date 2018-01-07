@@ -37,5 +37,6 @@ export default ({
     update: secured(customersService.update),
     changePassword: secured(customersService.changePassword),
     saveAddress: secured(customersService.saveAddress),
+    removeAddress: secured(customersService.removeAddress),
   };
 };
