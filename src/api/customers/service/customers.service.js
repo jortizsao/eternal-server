@@ -145,14 +145,6 @@ export default function ({
         const wasDefaultShipping = address.id === customer.defaultShippingAddressId;
         const wasDefaultBilling = address.id === customer.defaultBillingAddressId;
 
-        console.log(
-          'Dentro',
-          addressDraft.isDefaultShipping,
-          addressDraft.isDefaultBilling,
-          wasDefaultShipping,
-          wasDefaultBilling,
-        );
-
         if (
           addressDraft.isDefaultBilling ||
           addressDraft.isDefaultShipping ||
