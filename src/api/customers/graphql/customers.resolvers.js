@@ -9,7 +9,7 @@ function getAddresses(addresses, addressesId) {
 export default {
   Query: {
     customer(root, { id }, { customersService, authUser }) {
-      return customersService.byId({ id, authUser });
+      return customersService.byId(id, { authUser });
     },
   },
   Customer: {
@@ -31,7 +31,7 @@ export default {
   },
   Mutation: {
     updateCustomer(root, { id, customerDraft }, { customersService, authUser }) {
-      return customersService.update({ id, customerDraft, authUser });
+      return customersService.update(id, customerDraft, { authUser });
     },
 
     changeCustomerPassword(

@@ -1,5 +1,5 @@
 import customersResolvers from '../customers.resolvers';
-import CustomersService from '../../customers.service';
+import CustomersService from '../../service';
 import Config from '../../../../config';
 import CommonsService from '../../../commons/commons.service';
 
@@ -33,10 +33,7 @@ describe('Customers Resolvers', () => {
 
       customerQuery({}, { id: 'id1' }, { customersService, authUser: { id: 'id1' } })
         .then(customerResolved => {
-          expect(customersService.byId).toHaveBeenCalledWith({
-            id: 'id1',
-            authUser: { id: 'id1' },
-          });
+          expect(customersService.byId).toHaveBeenCalledWith('id1', { authUser: { id: 'id1' } });
           expect(customerResolved).toEqual(customer);
         })
         .then(done, done.fail);
@@ -120,11 +117,7 @@ describe('Customers Resolvers', () => {
       it('should update the customer', done => {
         updateCustomerMutation({}, { id, customerDraft }, { customersService, authUser })
           .then(customer => {
-            expect(customersService.update).toHaveBeenCalledWith({
-              id,
-              customerDraft,
-              authUser,
-            });
+            expect(customersService.update).toHaveBeenCalledWith(id, customerDraft, { authUser });
             expect(customer).toEqual({
               id,
               ...customerDraft,

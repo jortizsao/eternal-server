@@ -1,11 +1,11 @@
-import CustomersController from './customers.controller';
-import CustomersService from '../customers.service';
-import CustomersUtils from '../customers.utils';
-import CommonsService from '../../commons/commons.service';
-import JwtService from '../../../authorize/services/jwt.service';
-import Config from '../../../config';
-import Utils from '../../../utils';
-import { httpResponse as res } from '../../../../spec/helpers/mocks';
+import CustomersController from '../customers.controller';
+import CustomersService from '../../service';
+import CustomersUtils from '../../utils/customers.utils';
+import CommonsService from '../../../commons/commons.service';
+import JwtService from '../../../../authorize/services/jwt.service';
+import Config from '../../../../config';
+import Utils from '../../../../utils';
+import { httpResponse as res } from '../../../../../spec/helpers/mocks';
 
 describe('Customers', () => {
   describe('Controller', () => {

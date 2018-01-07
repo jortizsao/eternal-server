@@ -8,7 +8,7 @@ import AuthenticateLocalMiddleware from '../authenticate/middlewares/local.middl
 import AuthenticateLocalStrategy from '../authenticate/strategies/local.strategy';
 import AuthorizeJwtService from '../authorize/services/jwt.service';
 import CmsCache from '../api/cms/cms.cache';
-import CustomersService from '../api/customers/customers.service';
+import CustomersService from '../api/customers/service';
 import CmsController from '../api/cms/cms.controller';
 import CmsService from '../api/cms/cms.service';
 import CommonsService from '../api/commons/commons.service';
@@ -93,7 +93,7 @@ export default function () {
   }
 
   container.loadModules(
-    ['app/api/**/*.controller.js', 'app/api/**/*.service.js', 'app/api/*/*.utils.js'],
+    ['app/api/**/*.controller.js', 'app/api/**/*.service.js', 'app/api/**/*.utils.js'],
     {
       formatName: 'camelCase',
       registrationOptions: {

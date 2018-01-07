@@ -1,10 +1,10 @@
 import nock from 'nock';
-import Commercetools from '../../../commercetools';
+import Commercetools from '../../../../commercetools';
 import CustomersService from '../customers.service';
-import CustomObjectsService from '../../custom-objects/custom-objects.service';
-import CommonsService from '../../commons/commons.service';
-import Utils from '../../../utils';
-import { ValidationError, NotAuthorizedError, NotAuthenticatedError } from '../../../errors';
+import CustomObjectsService from '../../../custom-objects/custom-objects.service';
+import CommonsService from '../../../commons/commons.service';
+import Utils from '../../../../utils';
+import { ValidationError } from '../../../../errors';
 
 describe('Customers', () => {
   describe('Service', () => {
@@ -35,6 +35,7 @@ describe('Customers', () => {
 
     beforeEach(() => {
       nock(oauthHost)
+        .persist()
         .post('/oauth/token')
         .reply(200, {
           access_token: 'token1',
@@ -257,75 +258,13 @@ describe('Customers', () => {
 
         it('should update the customer', done => {
           customersService
-            .update({
-              id,
-              customerDraft,
-              authUser: { id },
-            })
+            .update(id, customerDraft)
             .then(() => {
               expect(customersCommonsService.update).toHaveBeenCalledWith({
                 id,
                 actions,
                 version,
               });
-            })
-            .then(done, done.fail);
-        });
-      });
-    });
-
-    describe('when getting a customer by id', () => {
-      let customer;
-
-      beforeEach(() => {
-        customer = {
-          id: 'id1',
-          firstName: 'javier',
-          lastName: 'ortiz',
-          email: 'javier.ortizsaorin@gmail.com',
-        };
-        spyOn(customersCommonsService, 'byId').and.returnValue(Promise.resolve(customer));
-      });
-
-      describe('when the user is authenticated', () => {
-        describe('when the user has the right permission', () => {
-          it('should get the customer', done => {
-            customersService
-              .byId({ id: 'id1', authUser: { id: 'id1' } })
-              .then(customerResolved => {
-                expect(customersCommonsService.byId).toHaveBeenCalledWith('id1');
-                expect(customerResolved).toEqual(customer);
-              })
-              .then(done, done.fail);
-          });
-        });
-
-        describe('when the user does not have the right permission', () => {
-          it('should throw a "not authorized" error', done => {
-            customersService
-              .byId({ id: 'id1', authUser: { id: 'id2' } })
-              .then(() => {
-                throw new Error('this promise should not have been resolved');
-              })
-              .catch(err => {
-                expect(customersCommonsService.byId).not.toHaveBeenCalled();
-                expect(err instanceof NotAuthorizedError).toBe(true);
-              })
-              .then(done, done.fail);
-          });
-        });
-      });
-
-      describe('when the user is not authenticated', () => {
-        it('should throw a "not authenticated" error', done => {
-          customersService
-            .byId({ id: 'id1', authUser: null })
-            .then(() => {
-              throw new Error('this promise should not have been resolved');
-            })
-            .catch(err => {
-              expect(customersCommonsService.byId).not.toHaveBeenCalled();
-              expect(err instanceof NotAuthenticatedError).toBe(true);
             })
             .then(done, done.fail);
         });
@@ -350,13 +289,13 @@ describe('Customers', () => {
       describe('when no errors', () => {
         beforeEach(() => {
           nock(host)
+            .persist()
             .post(`/${projectKey}/customers/password`, {
               id,
               currentPassword,
               newPassword,
               version,
             })
-            .times(2)
             .reply(200, {
               id,
               version: version + 1,
@@ -369,7 +308,6 @@ describe('Customers', () => {
           it("should update the customer's password", done => {
             customersService
               .changePassword(id, currentPassword, newPassword, {
-                authUser: { id },
                 version,
               })
               .then(customer => {
@@ -386,21 +324,12 @@ describe('Customers', () => {
 
         describe('when the version is not passed', () => {
           beforeEach(() => {
-            spyOn(customersService, 'byId').and.returnValue(
-              Promise.resolve({
-                id,
-                version,
-                customerNumber,
-                password: currentPassword,
-              }),
-            );
+            spyOn(customersService, 'getCustomerVersion').and.returnValue(Promise.resolve(1));
           });
 
           it("should update the customer's password", done => {
             customersService
-              .changePassword(id, currentPassword, newPassword, {
-                authUser: { id },
-              })
+              .changePassword(id, currentPassword, newPassword)
               .then(customer => {
                 expect(customer).toEqual({
                   id,
@@ -423,10 +352,7 @@ describe('Customers', () => {
 
             it('should throw a validation error', done => {
               customersService
-                .changePassword(id, currentPassword, newPassword, {
-                  authUser: { id },
-                  version,
-                })
+                .changePassword(id, currentPassword, newPassword)
                 .then(() => {
                   throw new Error('This promise should not have been resolved');
                 })
@@ -445,10 +371,7 @@ describe('Customers', () => {
 
             it('should throw a validation error', done => {
               customersService
-                .changePassword(id, currentPassword, newPassword, {
-                  authUser: { id },
-                  version,
-                })
+                .changePassword(id, currentPassword, newPassword)
                 .then(() => {
                   throw new Error('This promise should not have been resolved');
                 })
@@ -458,42 +381,6 @@ describe('Customers', () => {
                 })
                 .then(done, done.fail);
             });
-          });
-        });
-
-        describe('when the user is not authenticated', () => {
-          it('should throw a "not authenticated" error', done => {
-            customersService
-              .changePassword(id, currentPassword, newPassword, {
-                authUser: null,
-                version,
-              })
-              .then(() => {
-                throw new Error('This promise should not have been resolved');
-              })
-              .catch(err => {
-                expect(err instanceof NotAuthenticatedError).toBe(true);
-                expect(err.message).toBe('not authenticated');
-              })
-              .then(done, done.fail);
-          });
-        });
-
-        describe('when the user does not have the right permissions', () => {
-          it('should throw a "not authorized" error', done => {
-            customersService
-              .changePassword(id, currentPassword, newPassword, {
-                authUser: { id: 'otherId' },
-                version,
-              })
-              .then(() => {
-                throw new Error('This promise should not have been resolved');
-              })
-              .catch(err => {
-                expect(err instanceof NotAuthorizedError).toBe(true);
-                expect(err.message).toBe('not authorized');
-              })
-              .then(done, done.fail);
           });
         });
       });
@@ -511,10 +398,6 @@ describe('Customers', () => {
         country: 'spain',
       };
 
-      const authUser = {
-        id: 'id1',
-      };
-
       const version = 1;
 
       beforeEach(() => {
@@ -528,45 +411,16 @@ describe('Customers', () => {
             addresses: [address],
           });
 
-        spyOn(customersService, 'byId').and.returnValue(
-          Promise.resolve({
-            id: 'id1',
-            email: 'javier.ortizsaorin@gmail.com',
-            password: '12345',
-            version: 1,
-          }),
-        );
+        spyOn(customersService, 'getCustomerVersion').and.returnValue(Promise.resolve(1));
       });
 
       it('should validate the required fields', done => {
         spyOn(utils.commons, 'checkIfAddressHasRequiredFields');
 
         customersService
-          .addAddress(customerId, address, { authUser })
+          .addAddress(customerId, address)
           .then(() => {
             expect(utils.commons.checkIfAddressHasRequiredFields).toHaveBeenCalledWith(address);
-          })
-          .then(done, done.fail);
-      });
-
-      it('should validate if the user is authenticated', done => {
-        spyOn(utils.commons, 'checkIfUserAuthenticated');
-
-        customersService
-          .addAddress(customerId, address, { authUser })
-          .then(() => {
-            expect(utils.commons.checkIfUserAuthenticated).toHaveBeenCalledWith(authUser);
-          })
-          .then(done, done.fail);
-      });
-
-      it('should validate if the user is authorized', done => {
-        spyOn(utils.commons, 'checkIfUserAuthorized');
-
-        customersService
-          .addAddress(customerId, address, { authUser })
-          .then(() => {
-            expect(utils.commons.checkIfUserAuthorized).toHaveBeenCalledWith(customerId, authUser);
           })
           .then(done, done.fail);
       });
@@ -574,7 +428,7 @@ describe('Customers', () => {
       describe('when the customer version is passed', () => {
         it('should add the address to the customer', done => {
           customersService
-            .addAddress(customerId, address, { authUser, version })
+            .addAddress(customerId, address, { version })
             .then(customer => {
               expect(customer).toEqual({
                 id: 'id1',
@@ -590,7 +444,7 @@ describe('Customers', () => {
       describe('when the version is not passed', () => {
         it('should add the address to the customer', done => {
           customersService
-            .addAddress(customerId, address, { authUser })
+            .addAddress(customerId, address)
             .then(customer => {
               expect(customer).toEqual({
                 id: 'id1',
@@ -603,5 +457,15 @@ describe('Customers', () => {
         });
       });
     });
+
+    // describe('when setting the default billing address', () => {
+    //   it('should validate if the user is authenticated', (done) => {
+    //
+    //   });
+    //
+    //   it('should validate if the user is authorized', (done) => {
+    //
+    //   });
+    // });
   });
 });
