@@ -42,8 +42,8 @@ export default {
       return customersService.changePassword(id, currentPassword, newPassword, { authUser });
     },
 
-    addCustomerAddress(root, { id, addressDraft }, { customersService, authUser }) {
-      return customersService.addAddress(id, addressDraft, { authUser });
+    saveCustomerAddress(root, { id, addressDraft }, { customersService, authUser }) {
+      return customersService.saveAddress(id, addressDraft, { authUser });
     },
   },
 };

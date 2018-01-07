@@ -1,3 +1,4 @@
+import { last, get, pipe } from 'lodash/fp';
 import { ValidationError } from '../../../errors';
 
 export default function ({
@@ -120,26 +121,62 @@ export default function ({
       )
       .then(res => res.body);
 
-  service.addAddress = (id, address, options = {}) =>
+  service.saveAddress = (id, address, options = {}) =>
     Promise.resolve()
       .then(() => utils.commons.checkIfAddressHasRequiredFields(address))
       .then(() => service.getCustomerVersion(id, options.version))
-      .then(customerVersion =>
-        ctClient.execute({
-          uri: `${ctRequestBuilder.customers.build()}/${id}`,
-          method: 'POST',
-          body: {
-            version: customerVersion,
-            actions: [
-              {
-                action: 'addAddress',
-                address,
-              },
-            ],
-          },
+      .then(version =>
+        commonsService.update({
+          id,
+          version,
+          actions: [
+            {
+              action: address.id ? 'changeAddress' : 'addAddress',
+              address,
+              addressId: address.id,
+            },
+          ],
         }),
       )
-      .then(res => res.body);
+      .then(customer => {
+        if (address.isDefaultBilling || address.isDefaultShipping) {
+          const addressId = address.id || pipe(get('addresses'), last, get('id'))(customer);
+
+          return service.setDefaultAddress(id, addressId, {
+            version: customer.version,
+            isDefaultShipping: address.isDefaultShipping,
+            isDefaultBilling: address.isDefaultBilling,
+          });
+        }
+
+        return customer;
+      });
+
+  service.setDefaultAddress = (id, addressId, options = {}) => {
+    const actions = [];
+
+    if (options.isDefaultShipping) {
+      actions.push({
+        action: 'setDefaultShippingAddress',
+        addressId,
+      });
+    }
+
+    if (options.isDefaultBilling) {
+      actions.push({
+        action: 'setDefaultBillingAddress',
+        addressId,
+      });
+    }
+
+    return service.getCustomerVersion(id, options.version).then(version =>
+      commonsService.update({
+        id,
+        version,
+        actions,
+      }),
+    );
+  };
 
   return service;
 }
