@@ -5,9 +5,9 @@ export default {
     return !value || value.length === 0;
   },
 
-  fieldsToLowerCase(object) {
+  fieldsToLowerCase(object, options = { skip: [] }) {
     return Object.keys(object).reduce((objectLowerCase, key) => {
-      if (typeof object[key] === 'string') {
+      if (typeof object[key] === 'string' && options.skip.indexOf(key) === -1) {
         objectLowerCase[key] = object[key].toLowerCase();
       } else {
         objectLowerCase[key] = object[key];

@@ -130,14 +130,15 @@ export default function ({
   service.saveAddress = (id, addressDraft, options = {}) =>
     Promise.resolve()
       .then(() => utils.commons.checkIfAddressHasRequiredFields(addressDraft))
-      .then(() =>
+      .then(() => utils.commons.fieldsToLowerCase(addressDraft, { skip: ['country'] }))
+      .then(addressDraftLowerCased =>
         commonsService.update({
           id,
           version: options.version,
           actions: [
             {
               action: addressDraft.id ? 'changeAddress' : 'addAddress',
-              address: addressDraft,
+              address: addressDraftLowerCased,
               addressId: addressDraft.id,
             },
           ],
