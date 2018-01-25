@@ -1,3 +1,5 @@
+import { ConcurrencyError } from '../../errors';
+
 export default function ({ commercetools, entity }) {
   const ctClient = commercetools.client;
   const ctRequestBuilder = commercetools.requestBuilder;
@@ -40,7 +42,13 @@ export default function ({ commercetools, entity }) {
             updateEntity({ id, version: instance.version, actions }),
           );
         })
-        .then(res => res.body);
+        .then(res => res.body)
+        .catch(err => {
+          if (err.statusCode === 409) {
+            throw new ConcurrencyError();
+          }
+          throw new Error(err);
+        });
     },
 
     find({ where, page, perPage, sortBy, sortAscending, expand }) {

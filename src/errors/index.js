@@ -9,4 +9,9 @@ export class NotAuthenticatedError extends Error {
     super(message || 'not authenticated');
   }
 }
+export class ConcurrencyError extends Error {
+  constructor(message) {
+    super(message || 'concurrency error. version mismatch');
+  }
+}
 export class OtherError extends Error {}

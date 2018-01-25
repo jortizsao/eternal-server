@@ -4,7 +4,7 @@ import CustomersService from '../customers.service';
 import CustomObjectsService from '../../../custom-objects/custom-objects.service';
 import CommonsService from '../../../commons/commons.service';
 import Utils from '../../../../utils';
-import { ValidationError } from '../../../../errors';
+import { ValidationError, ConcurrencyError } from '../../../../errors';
 
 describe('Customers', () => {
   describe('Service', () => {
@@ -150,38 +150,92 @@ describe('Customers', () => {
         const newCustomerNumber = oldCustomerNumber + 1;
         const version = 1;
 
-        beforeEach(() => {
-          spyOn(customObjectsService, 'find').and.returnValue(
-            Promise.resolve({
-              results: [
-                {
-                  value: oldCustomerNumber,
+        describe('when no errors', () => {
+          beforeEach(() => {
+            spyOn(customObjectsService, 'find').and.returnValue(
+              Promise.resolve({
+                results: [
+                  {
+                    value: oldCustomerNumber,
+                    version,
+                  },
+                ],
+                total: 1,
+              }),
+            );
+            spyOn(customersService, 'setCustomerNumber').and.returnValue(
+              Promise.resolve(newCustomerNumber),
+            );
+          });
+
+          it('should get a customer number equals to <previous customer number> + 1', done => {
+            customersService
+              .getCustomerNumber(sequence)
+              .then(customerNumber => {
+                expect(customObjectsService.find).toHaveBeenCalledWith({
+                  where: `key="${sequence}"`,
+                });
+                expect(customersService.setCustomerNumber).toHaveBeenCalledWith({
+                  sequence,
+                  value: newCustomerNumber,
                   version,
-                },
-              ],
-              total: 1,
-            }),
-          );
-          spyOn(customersService, 'setCustomerNumber').and.returnValue(
-            Promise.resolve(newCustomerNumber),
-          );
+                });
+                expect(customerNumber).toBe(newCustomerNumber);
+              })
+              .then(done, done.fail);
+          });
         });
 
-        it('should get a customer number equals to <previous customer number> + 1', done => {
-          customersService
-            .getCustomerNumber(sequence)
-            .then(customerNumber => {
-              expect(customObjectsService.find).toHaveBeenCalledWith({
-                where: `key="${sequence}"`,
-              });
-              expect(customersService.setCustomerNumber).toHaveBeenCalledWith({
-                sequence,
-                value: newCustomerNumber,
-                version,
-              });
-              expect(customerNumber).toBe(newCustomerNumber);
-            })
-            .then(done, done.fail);
+        describe('when there is a concurrency error', () => {
+          beforeEach(() => {
+            spyOn(customObjectsService, 'find').and.returnValues(
+              Promise.resolve({
+                results: [
+                  {
+                    value: oldCustomerNumber,
+                    version,
+                  },
+                ],
+                total: 1,
+              }),
+              Promise.resolve({
+                results: [
+                  {
+                    value: oldCustomerNumber + 1,
+                    version,
+                  },
+                ],
+                total: 1,
+              }),
+            );
+            spyOn(customersService, 'setCustomerNumber').and.returnValues(
+              Promise.reject(new ConcurrencyError()),
+              Promise.resolve(newCustomerNumber + 1),
+            );
+          });
+
+          it('should try again with the new customer number + 1', done => {
+            customersService
+              .getCustomerNumber(sequence)
+              .then(customerNumber => {
+                expect(customersService.setCustomerNumber.calls.argsFor(0)).toEqual([
+                  {
+                    sequence,
+                    value: newCustomerNumber,
+                    version,
+                  },
+                ]);
+                expect(customersService.setCustomerNumber.calls.argsFor(1)).toEqual([
+                  {
+                    sequence,
+                    value: newCustomerNumber + 1,
+                    version,
+                  },
+                ]);
+                expect(customerNumber).toBe(newCustomerNumber + 1);
+              })
+              .then(done, done.fail);
+          });
         });
       });
 
@@ -460,6 +514,71 @@ describe('Customers', () => {
                 password: '12345',
                 addresses: [address],
               });
+            })
+            .then(done, done.fail);
+        });
+      });
+    });
+
+    describe('when setting the customer number', () => {
+      let sequence;
+      let customerNumber;
+
+      beforeEach(() => {
+        sequence = 'customersNumber';
+        customerNumber = 1;
+        spyOn(customObjectsService, 'save').and.returnValue(
+          Promise.resolve({
+            container: sequence,
+            key: sequence,
+            value: customerNumber,
+            version: 1,
+          }),
+        );
+      });
+
+      it('should save the new customer number as custom object', done => {
+        customersService
+          .setCustomerNumber({ sequence, value: customerNumber })
+          .then(customerNumberSaved => {
+            expect(customerNumberSaved).toBe(customerNumber);
+          })
+          .then(done, done.fail);
+      });
+    });
+
+    describe('when getting the customer version', () => {
+      let id;
+      let version;
+
+      beforeEach(() => {
+        id = 'id1';
+        version = 1;
+        spyOn(customersService, 'byId').and.returnValue(
+          Promise.resolve({
+            id: 'id1',
+            version: 2,
+          }),
+        );
+      });
+
+      describe('when the version is passed', () => {
+        it('should return the passed version', done => {
+          customersService
+            .getCustomerVersion(id, version)
+            .then(versionResponse => {
+              expect(versionResponse).toBe(1);
+            })
+            .then(done, done.fail);
+        });
+      });
+
+      describe('when the version is not passed', () => {
+        it('should return the version from the service', done => {
+          customersService
+            .getCustomerVersion(id)
+            .then(versionResponse => {
+              expect(versionResponse).toBe(2);
             })
             .then(done, done.fail);
         });

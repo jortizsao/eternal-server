@@ -1,5 +1,5 @@
 import { last, get, find, pipe } from 'lodash/fp';
-import { ValidationError } from '../../../errors';
+import { ValidationError, ConcurrencyError } from '../../../errors';
 
 export default function ({
   commercetools,
@@ -37,15 +37,21 @@ export default function ({
     customObjectsService
       .find({ where: `key="${sequence}"` })
       .then(({ results }) => (results.length > 0 ? results[0] : { value: 0 }))
-      .then(lastValue => {
-        return service
+      .then(lastValue =>
+        service
           .setCustomerNumber({
             sequence,
             value: lastValue.value + 1,
             version: lastValue.version,
           })
-          .catch(() => service.getCustomerNumber(sequence)); // We request a new one on error
-      });
+          .catch(err => {
+            if (err instanceof ConcurrencyError) {
+              return service.getCustomerNumber(sequence); // We request a new one on error
+            }
+
+            throw new Error(err);
+          }),
+      );
 
   service.getCustomerVersion = (id, version) =>
     Promise.resolve().then(() => version || service.byId(id).then(customer => customer.version));
