@@ -1,19 +1,21 @@
-FROM node:8.9
-
-ENV APP_HOME /app
-
-WORKDIR $APP_HOME
+FROM node:8-alpine as builder
 
 COPY ["package.json", ".babelrc", ".eslintrc.js", ".eslintignore", "README.md", "package-lock.json", "./"]
-
-RUN npm install
-
 COPY ["spec", "spec"]
 COPY ["src", "src"]
 
-# Run tests
-ENV NODE_ENV test
-RUN npm test
+RUN npm install
+RUN npm run build
+
+ENV NODE_ENV production
+RUN npm install
+
+
+FROM node:8-alpine
+
+COPY --from=builder /app ./app
+COPY --from=builder /package.json ./package.json
+COPY --from=builder /node_modules ./node_modules
 
 # Expose port
 ENV PORT 3000
