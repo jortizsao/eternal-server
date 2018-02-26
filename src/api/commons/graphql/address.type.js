@@ -1,6 +1,7 @@
 const address = `
   type Address {
     id: ID!
+    key: String
     title: String
     salutation: String
     firstName: String
@@ -27,6 +28,7 @@ const address = `
 
   input AddressDraft {
     id: ID
+    key: String
     title: String
     firstName: String!
     lastName: String!
