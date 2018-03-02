@@ -13,6 +13,9 @@ import CmsController from '../api/cms/cms.controller';
 import CmsService from '../api/cms/cms.service';
 import CommonsService from '../api/commons/commons.service';
 import CustomObjectsService from '../api/custom-objects/custom-objects.service';
+import CustomersSchema from '../api/customers/graphql/customers.schema';
+import CommercetoolsSchema from '../graphql/commercetools/commercetools.schema';
+import GraphqlSchema from '../graphql/schema';
 
 export default function () {
   const container = createContainer();
@@ -120,6 +123,9 @@ export default function () {
     customObjectsService: getSingleton(CustomObjectsService, _container => ({
       commonsService: getCommonsService(_container, 'customObjects'),
     })),
+    customersSchema: getSingleton(CustomersSchema),
+    commercetoolsSchema: getSingleton(CommercetoolsSchema),
+    graphqlSchema: getSingleton(GraphqlSchema),
   });
 
   return container;
