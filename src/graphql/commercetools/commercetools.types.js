@@ -90,7 +90,7 @@ const schema = `
   #
   # The number of active cart discounts that do not require a discount code
   # (isActive=true and requiresDiscountCode=false) is limited to 100.
-  #       
+  #
   type CartDiscount implements Versioned {
     id: String!
     version: Long!
@@ -1014,7 +1014,7 @@ const schema = `
   # minutes to update all the prices with the discounts.
   #
   # The maximum number of ProductDiscounts that can be active at the same time is **200**.
-  #       
+  #
   type ProductDiscount implements Versioned {
     id: String!
     version: Long!
