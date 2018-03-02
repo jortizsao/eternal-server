@@ -2,7 +2,6 @@ import { Router } from 'express';
 import bodyParser from 'body-parser';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
 import jwt from 'express-jwt';
-import graphqlSchema from '../graphql/schema';
 import CustomersRest from '../api/customers/rest';
 import Cms from '../api/cms';
 
@@ -13,6 +12,7 @@ export default ({ app, container }) => {
   const customersController = container.resolve('customersController');
   const cmsController = container.resolve('cmsController');
   const authenticateMiddleware = container.resolve('authenticateMiddleware');
+  const graphqlSchema = container.resolve('graphqlSchema');
   const config = container.resolve('config');
 
   app.use('/api/customers', CustomersRest({ router, customersController, authenticateMiddleware }));
