@@ -12,7 +12,7 @@ The two projects are completely decoupled. Thus, they are flexible enough that y
 
 ## Architecture
 
-![ARCHITECTURE](<https://s3.amazonaws.com/eternal-documentation/eternal-architecture+(8).png>)
+![ARCHITECTURE](<https://s3.amazonaws.com/eternal-architecture/eternal-architecture+(8).png>)
 
 ## Technologies
 
