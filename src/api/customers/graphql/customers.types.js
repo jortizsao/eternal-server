@@ -1,7 +1,7 @@
 import Address from '../../commons/graphql/address.type';
 
 const Customer = `
-  type Customer {
+  type Customer @cacheControl(maxAge: 240) {
     id: ID!
     customerNumber: String
     email: String
