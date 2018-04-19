@@ -29,14 +29,28 @@ export default ({ isCacheEnabled, cmsUrl, logger, cache }) => {
 
     getFromCms(slug, version, token) {
       return rp({
-        baseUrl: cmsUrl,
-        uri: slug,
+        baseUrl: 'http://api.storyblok.com/v1/cdn',
+        uri: 'spaces/me',
         qs: {
-          version,
           token,
         },
         json: true,
-      }).then(res => res.story);
+      })
+        .then(res => res.space.version)
+        .then(cv => {
+          console.log('cv', cv);
+
+          return rp({
+            baseUrl: cmsUrl,
+            uri: slug,
+            qs: {
+              version,
+              token,
+              cv,
+            },
+            json: true,
+          }).then(res => res.story);
+        });
     },
 
     clearCache() {
