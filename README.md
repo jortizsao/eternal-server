@@ -18,7 +18,7 @@ I have a working demo of both projects (client and server) deployed on AWS as de
 
 If you are interested in seeing this demo in action, please contact me at javier.ortizsaorin@gmail.com to arrange a meeting.
 
-![enter image description here](https://s3.amazonaws.com/eternal-architecture/eternal4.gif)
+![enter image description here](https://s3.amazonaws.com/eternal-architecture/eternal5.gif)
 
 ![enter image description here](https://s3.amazonaws.com/eternal-architecture/eternal2.gif)
 
