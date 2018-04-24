@@ -30,7 +30,7 @@ export default ({ app, container }) => {
         authUser: req.user,
       },
       tracing: process.env.NODE_ENV === 'production',
-      cacheControl: process.env.NODE_ENV === 'production',
+      // cacheControl: process.env.NODE_ENV === 'production',
     })),
   );
   app.get('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
