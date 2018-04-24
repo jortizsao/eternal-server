@@ -26,7 +26,7 @@ If you are interested in seeing this demo in action, please contact me at javier
 
 ![ARCHITECTURE](https://s3.amazonaws.com/eternal-architecture/eternal-architecture.png)
 
-## 10000 foot view technologies
+## 10000' view technologies
 
 This is the overall list of technologies that the backend leans on:
 
@@ -47,7 +47,8 @@ The API is mainly a GraphQL API served by the Apollo Server, which is a library 
 This API can be queried from any GraphQL client.
 
 * ### [Express.js](http://expressjs.com/)
-  The API is powered by this famous web application server.
+
+The API is powered by this famous web application server.
 
 In order to scale the API as much as possible, this server is completely stateless, thus, it doesn't store any sessions for identifying/authenticating the requests.
 
