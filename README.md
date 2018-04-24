@@ -18,7 +18,7 @@ I have a working demo of both projects (client and server) deployed on AWS as de
 
 If you are interested in seeing this demo in action, please contact me at javier.ortizsaorin@gmail.com to arrange a meeting.
 
-![enter image description here](https://s3.amazonaws.com/eternal-architecture/eternal1.gif)
+![enter image description here](https://s3.amazonaws.com/eternal-architecture/eternal4.gif)
 
 ![enter image description here](https://s3.amazonaws.com/eternal-architecture/eternal2.gif)
 
@@ -60,7 +60,8 @@ If the token is invalid or expired, the server responds with a 401 http error.
 If the token is valid, the decoded payload is used by the subsequent layers to authorised the request.
 
 * ### [AWS SNS](https://aws.amazon.com/sns/)
-  All asynchronous operations are handled by an event driven architecture.
+
+All asynchronous operations are handled by an event driven architecture.
 
 The hub of these events is the [AWS SNS](https://aws.amazon.com/sns/) service.
 
