@@ -10,7 +10,7 @@ export default ({ clientId, clientSecret, projectKey, host, oauthHost, concurren
 
   let token;
 
-  const getExpirationTime = expiresIn => {
+  commercetools.getExpirationTime = expiresIn => {
     if (expiresIn) {
       // Add a gap of 2 hours before expiration time.
       const twoHours = 2 * 60 * 60 * 1000;
@@ -21,7 +21,7 @@ export default ({ clientId, clientSecret, projectKey, host, oauthHost, concurren
     return 0;
   };
 
-  const getNewToken = async () =>
+  commercetools.getNewToken = async () =>
     request
       .post({
         url: `${oauthHost}/oauth/token?grant_type=client_credentials&scope=manage_project:${projectKey}`,
@@ -30,10 +30,10 @@ export default ({ clientId, clientSecret, projectKey, host, oauthHost, concurren
       .auth(clientId, clientSecret)
       .then(res => ({
         accessToken: res.access_token,
-        expiresIn: res.expires_in,
+        expiresAt: commercetools.getExpirationTime(res.expires_in),
       }));
 
-  const isTokenExpired = t => Date.now() > getExpirationTime(t.expiresIn);
+  commercetools.isTokenExpired = t => Date.now() > t.expiresAt;
 
   commercetools.client = createClient({
     middlewares: [
@@ -57,11 +57,15 @@ export default ({ clientId, clientSecret, projectKey, host, oauthHost, concurren
   commercetools.getProjectKey = () => projectKey;
 
   commercetools.getAccessToken = async () => {
-    if (!token || isTokenExpired(token)) {
-      token = await getNewToken();
+    if (!token || commercetools.isTokenExpired(token)) {
+      token = await commercetools.getNewToken();
     }
 
     return token.accessToken;
+  };
+
+  commercetools.setAccessToken = t => {
+    token = t;
   };
 
   return commercetools;
