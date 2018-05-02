@@ -1,5 +1,5 @@
 const address = `
-  type Address @cacheControl(maxAge: 240) {
+  type Address @cacheControl(maxAge: 0) {
     id: ID!
     key: String
     title: String

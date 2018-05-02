@@ -1,5 +1,5 @@
 const schema = `
-  type AbsoluteDiscountValue implements CartDiscountValue, ProductDiscountValue {
+  type AbsoluteDiscountValue implements CartDiscountValue {
     money: [Money!]!
     type: String!
   }
@@ -1326,7 +1326,7 @@ const schema = `
     name: String!
   }
 
-  type RelativeDiscountValue implements CartDiscountValue, ProductDiscountValue {
+  type RelativeDiscountValue implements CartDiscountValue {
     permyriad: Int!
     type: String!
   }

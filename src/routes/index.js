@@ -30,7 +30,12 @@ export default ({ app, container }) => {
         authUser: req.user,
       },
       tracing: process.env.NODE_ENV === 'production',
-      // cacheControl: process.env.NODE_ENV === 'production',
+      cacheControl:
+        process.env.NODE_ENV === 'production'
+          ? {
+            defaultMaxAge: config.get('APOLLO:ENGINE:CACHE_DEFAULT_MAX_AGE') || 240,
+          }
+          : false,
     })),
   );
   app.get('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
