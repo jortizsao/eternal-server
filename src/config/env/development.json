@@ -4,7 +4,7 @@
   },
   "TOKEN": {
     "SECRET": "",
-    "MAX_AGE_SECONDS": 604800
+    "MAX_AGE_SECONDS": 86400
   },
   "COMMERCE_TOOLS": {
     "PROJECT_KEY": "",
@@ -19,7 +19,12 @@
   "CMS": {
     "URL": "",
     "PRIVATE_ACCESS_TOKEN": "",
-    "PUBLIC_ACCESS_TOKEN": "",
-    "CACHE_ENABLED": true
+    "PUBLIC_ACCESS_TOKEN": ""
+  },
+  "APOLLO": {
+    "ENGINE": {
+      "KEY": "",
+      "CACHE_DEFAULT_MAX_AGE": ""
+    }
   }
 }
