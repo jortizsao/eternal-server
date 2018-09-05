@@ -7,7 +7,7 @@ COPY ["src", "src"]
 RUN npm ci
 RUN npm run build
 
-RUN rm -rf node_modules
+
 ENV NODE_ENV production
 RUN npm ci
 
@@ -21,7 +21,6 @@ COPY --from=builder /node_modules ./node_modules
 # Expose port
 ENV PORT 3000
 EXPOSE 3000
-ENV NODE_ENV production
 
 # Run
 CMD npm run server

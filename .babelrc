@@ -4,12 +4,12 @@
       "env",
       {
         "targets": {
-          "node": true
+          "node": "current"
         }
       }
-    ]
+    ],
+    "stage-3"
   ],
-  "plugins": ["transform-object-rest-spread", "transform-runtime"],
   "env": {
     "test": {
       "plugins": ["istanbul"]
