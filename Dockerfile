@@ -4,12 +4,12 @@ COPY ["package.json", ".babelrc", ".eslintrc.js", ".eslintignore", "README.md", 
 COPY ["spec", "spec"]
 COPY ["src", "src"]
 
-RUN npm ci
+RUN npm install
 RUN npm run build
 
 RUN rm -rf node_modules
 ENV NODE_ENV production
-RUN npm ci
+RUN npm install
 
 
 FROM node:10-alpine
