@@ -1,17 +1,18 @@
-FROM node:8-alpine as builder
+FROM node:10-alpine as builder
 
 COPY ["package.json", ".babelrc", ".eslintrc.js", ".eslintignore", "README.md", "package-lock.json", "./"]
 COPY ["spec", "spec"]
 COPY ["src", "src"]
 
-RUN npm install
+RUN npm ci
 RUN npm run build
 
+RUN rm -rf node_modules
 ENV NODE_ENV production
-RUN npm install
+RUN npm ci
 
 
-FROM node:8-alpine
+FROM node:10-alpine
 
 COPY --from=builder /app ./app
 COPY --from=builder /package.json ./package.json
