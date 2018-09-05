@@ -37,7 +37,7 @@
     "copy_config": "cp -r src/config/env app/config/env",
     "lint": "eslint src",
     "dev": "npm-run-all build server",
-    "server": "cross-env NODE_ENV=production node app/index.js",
+    "server": "node app/index.js",
     "start": "npm-watch",
     "jasmine": "nyc jasmine",
     "test": "cross-env NODE_ENV=test npm-run-all build jasmine",
