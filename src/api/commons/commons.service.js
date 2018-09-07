@@ -2,11 +2,13 @@ import { ConcurrencyError } from '../../errors';
 
 export default function ({ commercetools, entity }) {
   const ctClient = commercetools.client;
-  const ctRequestBuilder = commercetools.requestBuilder;
+  const ctGetRequestBuilder = commercetools.getRequestBuilder;
 
   function updateEntity({ id, version, actions }) {
     return ctClient.execute({
-      uri: ctRequestBuilder[entity].parse({ id }).build(),
+      // prettier-ignore
+      uri: ctGetRequestBuilder()[entity].parse({ id })
+        .build(),
       method: 'POST',
       body: { version, actions },
     });
@@ -16,7 +18,9 @@ export default function ({ commercetools, entity }) {
     byId(id) {
       return ctClient
         .execute({
-          uri: ctRequestBuilder[entity].parse({ id }).build(),
+          // prettier-ignore
+          uri: ctGetRequestBuilder()[entity].parse({ id })
+            .build(),
           method: 'GET',
         })
         .then(res => res.body);
@@ -25,7 +29,7 @@ export default function ({ commercetools, entity }) {
     save(params) {
       return ctClient
         .execute({
-          uri: ctRequestBuilder[entity].build(),
+          uri: ctGetRequestBuilder()[entity].build(),
           method: 'POST',
           body: params,
         })
@@ -52,7 +56,7 @@ export default function ({ commercetools, entity }) {
     },
 
     find({ where, page, perPage, sortBy, sortAscending, expand }) {
-      let requestBuilder = ctRequestBuilder[entity];
+      let requestBuilder = ctGetRequestBuilder()[entity];
 
       requestBuilder = where ? requestBuilder.where(where) : requestBuilder;
       requestBuilder = sortBy ? requestBuilder.sort(sortBy, sortAscending) : requestBuilder;

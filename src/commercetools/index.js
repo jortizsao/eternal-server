@@ -50,7 +50,7 @@ export default ({ clientId, clientSecret, projectKey, host, oauthHost, concurren
     ],
   });
 
-  commercetools.requestBuilder = createRequestBuilder({ projectKey });
+  commercetools.getRequestBuilder = () => createRequestBuilder({ projectKey });
 
   commercetools.getApiHost = () => host;
 
