@@ -11,7 +11,7 @@ export default function ({
 }) {
   const service = {};
   const ctClient = commercetools.client;
-  const ctRequestBuilder = commercetools.requestBuilder;
+  const ctGetRequestBuilder = commercetools.getRequestBuilder;
 
   const checkChangePasswordRequiredFields = (currentPassword, newPassword) => {
     if (utils.commons.isStringEmpty(currentPassword)) {
@@ -66,7 +66,7 @@ export default function ({
   service.signIn = (email, password, anonymousCartId) =>
     ctClient
       .execute({
-        uri: `${ctRequestBuilder.project.build()}login`,
+        uri: `${ctGetRequestBuilder().project.build()}login`,
         method: 'POST',
         body: { email, password, anonymousCartId },
       })
@@ -120,7 +120,7 @@ export default function ({
       .then(() => service.getCustomerVersion(id, options.version))
       .then(customerVersion =>
         ctClient.execute({
-          uri: `${ctRequestBuilder.customers.build()}/password`,
+          uri: `${ctGetRequestBuilder().customers.build()}/password`,
           method: 'POST',
           body: { id, version: customerVersion, currentPassword, newPassword },
         }),
@@ -146,8 +146,14 @@ export default function ({
       )
       .then(customer => {
         const address = addressDraft.id
-          ? pipe(get('addresses'), find({ id: addressDraft.id }))(customer)
-          : pipe(get('addresses'), last)(customer);
+          ? pipe(
+              get('addresses'),
+              find({ id: addressDraft.id }),
+            )(customer)
+          : pipe(
+              get('addresses'),
+              last,
+            )(customer);
         const wasDefaultShipping = address.id === customer.defaultShippingAddressId;
         const wasDefaultBilling = address.id === customer.defaultBillingAddressId;
 
