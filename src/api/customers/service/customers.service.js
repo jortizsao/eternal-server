@@ -10,8 +10,7 @@ export default function ({
   utils,
 }) {
   const service = {};
-  const ctClient = commercetools.client;
-  const ctGetRequestBuilder = commercetools.getRequestBuilder;
+  const { client, getRequestBuilder } = commercetools;
 
   const checkChangePasswordRequiredFields = (currentPassword, newPassword) => {
     if (utils.commons.isStringEmpty(currentPassword)) {
@@ -64,9 +63,9 @@ export default function ({
       .then(commonsService.save);
 
   service.signIn = (email, password, anonymousCartId) =>
-    ctClient
+    client
       .execute({
-        uri: `${ctGetRequestBuilder().project.build()}login`,
+        uri: `${getRequestBuilder().project.build()}login`,
         method: 'POST',
         body: { email, password, anonymousCartId },
       })
@@ -119,8 +118,8 @@ export default function ({
       .then(() => checkChangePasswordRequiredFields(currentPassword, newPassword))
       .then(() => service.getCustomerVersion(id, options.version))
       .then(customerVersion =>
-        ctClient.execute({
-          uri: `${ctGetRequestBuilder().customers.build()}/password`,
+        client.execute({
+          uri: `${getRequestBuilder().customers.build()}/password`,
           method: 'POST',
           body: { id, version: customerVersion, currentPassword, newPassword },
         }),

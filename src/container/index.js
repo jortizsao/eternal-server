@@ -15,6 +15,7 @@ import CommonsService from '../api/commons/commons.service';
 import CustomObjectsService from '../api/custom-objects/custom-objects.service';
 import CustomersSchema from '../api/customers/graphql/customers.schema';
 import CommercetoolsSchema from '../graphql/commercetools/commercetools.schema';
+import ProductsSchema from '../api/products/graphql/products.schema';
 import GraphqlSchema from '../graphql/schema';
 
 export default function () {
@@ -127,6 +128,7 @@ export default function () {
     })),
     customersSchema: getSingleton(CustomersSchema),
     commercetoolsSchema: getSingleton(CommercetoolsSchema),
+    productsSchema: getSingleton(ProductsSchema),
     graphqlSchema: getSingleton(GraphqlSchema),
   });
 

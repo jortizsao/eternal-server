@@ -9,6 +9,7 @@ export default ({ app, container }) => {
   const router = new Router();
 
   const customersService = container.resolve('customersService');
+  const productsService = container.resolve('productsService');
   const customersController = container.resolve('customersController');
   const cmsController = container.resolve('cmsController');
   const authenticateMiddleware = container.resolve('authenticateMiddleware');
@@ -27,6 +28,7 @@ export default ({ app, container }) => {
       schema: graphqlSchema,
       context: {
         customersService,
+        productsService,
         authUser: req.user,
       },
       tracing: process.env.NODE_ENV === 'production',

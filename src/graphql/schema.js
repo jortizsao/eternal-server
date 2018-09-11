@@ -1,6 +1,6 @@
 import { mergeSchemas } from 'graphql-tools';
 
-export default ({ commercetoolsSchema, customersSchema }) =>
+export default ({ commercetoolsSchema, customersSchema, productsSchema }) =>
   mergeSchemas({
-    schemas: [customersSchema, commercetoolsSchema],
+    schemas: [customersSchema, commercetoolsSchema, productsSchema],
   });
