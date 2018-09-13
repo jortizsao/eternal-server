@@ -1,9 +1,9 @@
-import commons from '../../commons/graphql/commons.type';
-import attributeDefinition from '../../commons/graphql/attribute-definition.type';
-import state from '../../commons/graphql/state.type';
-import taxCategory from '../../commons/graphql/tax-category.type';
-import image from '../../commons/graphql/image.type';
-import discount from '../../commons/graphql/discount.type';
+import commons from '../../commons/graphql/types/commons.type';
+import attributeDefinition from '../../commons/graphql/types/attribute-definition.type';
+import state from '../../commons/graphql/types/state.type';
+import taxCategory from '../../commons/graphql/types/tax-category.type';
+import image from '../../commons/graphql/types/image.type';
+import discount from '../../commons/graphql/types/discount.type';
 import category from '../../categories/graphql/categories.types';
 
 const productsSearch = `

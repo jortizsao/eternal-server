@@ -1,4 +1,4 @@
-import commons from '../../commons/graphql/commons.type';
+import commons from '../../commons/graphql/types/commons.type';
 
 const category = `
   type CategoryOrderHint {
