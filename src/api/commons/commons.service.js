@@ -1,13 +1,12 @@
 import { ConcurrencyError } from '../../errors';
 
 export default function ({ commercetools, entity }) {
-  const ctClient = commercetools.client;
-  const ctGetRequestBuilder = commercetools.getRequestBuilder;
+  const { client, getRequestBuilder } = commercetools;
 
   function updateEntity({ id, version, actions }) {
-    return ctClient.execute({
+    return client.execute({
       // prettier-ignore
-      uri: ctGetRequestBuilder()[entity].parse({ id })
+      uri: getRequestBuilder()[entity].parse({ id })
         .build(),
       method: 'POST',
       body: { version, actions },
@@ -16,10 +15,10 @@ export default function ({ commercetools, entity }) {
 
   return {
     byId(id) {
-      return ctClient
+      return client
         .execute({
           // prettier-ignore
-          uri: ctGetRequestBuilder()[entity].parse({ id })
+          uri: getRequestBuilder()[entity].parse({ id })
             .build(),
           method: 'GET',
         })
@@ -27,9 +26,9 @@ export default function ({ commercetools, entity }) {
     },
 
     save(params) {
-      return ctClient
+      return client
         .execute({
-          uri: ctGetRequestBuilder()[entity].build(),
+          uri: getRequestBuilder()[entity].build(),
           method: 'POST',
           body: params,
         })
@@ -56,7 +55,7 @@ export default function ({ commercetools, entity }) {
     },
 
     find({ where, page, perPage, sortBy, sortAscending, expand }) {
-      let requestBuilder = ctGetRequestBuilder()[entity];
+      let requestBuilder = getRequestBuilder()[entity];
 
       requestBuilder = where ? requestBuilder.where(where) : requestBuilder;
       requestBuilder = sortBy ? requestBuilder.sort(sortBy, sortAscending) : requestBuilder;
@@ -64,7 +63,7 @@ export default function ({ commercetools, entity }) {
       requestBuilder = perPage ? requestBuilder.perPage(perPage) : requestBuilder;
       requestBuilder = expand ? requestBuilder.expand(expand) : requestBuilder;
 
-      return ctClient
+      return client
         .execute({
           uri: requestBuilder.build(),
           method: 'GET',

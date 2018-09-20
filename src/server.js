@@ -8,6 +8,7 @@ import passport from 'passport';
 import { ApolloEngine } from 'apollo-engine';
 import routes from './routes';
 import Container from './container';
+import { ValidationError, NotAuthenticatedError, CommercetoolsError } from './errors';
 
 function initMiddleware({ app }) {
   app.use(cors());
@@ -28,15 +29,40 @@ function initMiddleware({ app }) {
   app.use(passport.initialize());
 }
 
+function sendError(res, err, statusCode) {
+  return res.status(statusCode).json({
+    code: err.code || statusCode,
+    error: err.constructor.name,
+    message: err.message,
+    ...(err.errors && { errors: err.errors }),
+  });
+}
+
+function handleError({ err, res, logger }) {
+  if (err instanceof ValidationError) {
+    return sendError(res, err, 400);
+  } else if (err instanceof NotAuthenticatedError) {
+    return sendError(res, err, 401);
+  } else if (err instanceof CommercetoolsError) {
+    if (err.code >= 500) {
+      logger.error(JSON.stringify(err));
+    }
+
+    return sendError(res, err, err.code);
+  } else {
+    // If any of the previous middlewares has a "not managed error" we log it and return HTTP 500
+    logger.error(err.stack);
+    return sendError(res, err, 500);
+  }
+}
+
 function initErrorRoutes({ app, logger }) {
   app.use((err, req, res, next) => {
-    // If the error object doesn't exists
     if (!err) {
       return next();
     }
 
-    logger.error(err.stack);
-    return res.sendStatus(500);
+    return handleError({ err, res, logger });
   });
 }
 

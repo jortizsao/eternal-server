@@ -1,4 +1,4 @@
-import Address from '../../commons/graphql/address.type';
+import Address from '../../commons/graphql/types/address.type';
 
 const Customer = `
   type Customer @cacheControl(maxAge: 0) {

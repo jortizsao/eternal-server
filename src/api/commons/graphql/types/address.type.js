@@ -43,4 +43,4 @@ const address = `
   }
 `;
 
-export default address;
+export default () => [address];
